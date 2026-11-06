@@ -196,11 +196,21 @@ export async function runLiveBrowserScan(
           );
         }
 
-        // Parse header count numbers (e.g. "1,245 following" → 1245)
+        // Parse header count numbers (e.g. "1,245 following" → 1245, "12.5K" → 12500)
         const parseNumber = (el: HTMLElement) => {
-          const text = el.innerText || el.textContent || '';
-          const num = text.replace(/[^0-9]/g, '');
-          return parseInt(num, 10) || 0;
+          const title = el.getAttribute('title') || el.querySelector('[title]')?.getAttribute('title');
+          if (title) {
+            const num = title.replace(/[^0-9]/g, '');
+            if (num) return parseInt(num, 10);
+          }
+          const text = (el.innerText || el.textContent || '').trim();
+          const match = text.match(/([0-9]+(?:[.,][0-9]+)?)\s*([km])?/i);
+          if (!match) return 0;
+          let val = parseFloat(match[1].replace(',', '.'));
+          const unit = (match[2] || '').toUpperCase();
+          if (unit === 'K') val *= 1000;
+          if (unit === 'M') val *= 1000000;
+          return Math.round(val) || 0;
         };
 
         const targetFollowingCount = parseNumber(followingLink);
@@ -217,7 +227,7 @@ export async function runLiveBrowserScan(
           label: string,
           basePct: number,
           scalePct: number
-        ): Promise<string[]> {
+        ): Promise<Array<{ username: string; fullName?: string }>> {
           if (isAborted) return [];
 
           updateHud(`Opening ${label}...`, basePct);
@@ -260,55 +270,50 @@ export async function runLiveBrowserScan(
           const userMap = new Map<string, { username: string; fullName?: string }>();
           let stagnantCount = 0;
           let lastHeight = 0;
+          const hasTarget = targetCount > 0;
 
-          while (!isAborted && userMap.size < targetCount && stagnantCount < 8) {
+          while (!isAborted && (!hasTarget || userMap.size < targetCount) && stagnantCount < 8) {
             // 1. Scrape currently visible anchor elements in the virtual viewport
             const anchors = (scrollBox || document).querySelectorAll<HTMLAnchorElement>('a[role="link"]');
             let foundNewInPass = false;
 
             anchors.forEach((a) => {
               const href = a.getAttribute('href');
-              if (
-                href &&
-                href.startsWith('/') &&
-                !href.includes('/explore/') &&
-                !href.includes('/p/') &&
-                !href.includes('/reel/') &&
-                !href.includes('/stories/')
-              ) {
-                const u = cleanUser(href);
-                const key = u.toLowerCase();
-                if (u && key !== currentUsername.toLowerCase() && !userMap.has(key)) {
-                  let fullName: string | undefined = undefined;
-                  try {
-                    const row =
-                      a.closest('div[role="none"]') ||
-                      a.closest('li') ||
-                      a.parentElement?.parentElement;
-                    if (row) {
-                      const textSpans = row.querySelectorAll('span');
-                      for (const s of textSpans) {
-                        const txt = s.innerText?.trim();
-                        if (
-                          txt &&
-                          txt.toLowerCase() !== key &&
-                          !txt.startsWith('@') &&
-                          !txt.includes('Follow') &&
-                          !txt.includes('Verified') &&
-                          txt.length < 50
-                        ) {
-                          fullName = txt;
-                          break;
-                        }
+              if (!href || !href.startsWith('/')) return;
+              const u = cleanUser(href);
+              if (!u || excludedRoutes.includes(u.toLowerCase())) return;
+
+              const key = u.toLowerCase();
+              if (key !== currentUsername.toLowerCase() && !userMap.has(key)) {
+                let fullName: string | undefined = undefined;
+                try {
+                  const row =
+                    a.closest('div[role="none"]') ||
+                    a.closest('li') ||
+                    a.parentElement?.parentElement;
+                  if (row) {
+                    const textSpans = row.querySelectorAll('span');
+                    for (const s of textSpans) {
+                      const txt = s.innerText?.trim();
+                      if (
+                        txt &&
+                        txt.toLowerCase() !== key &&
+                        !txt.startsWith('@') &&
+                        !txt.includes('Follow') &&
+                        !txt.includes('Verified') &&
+                        txt.length < 50
+                      ) {
+                        fullName = txt;
+                        break;
                       }
                     }
-                  } catch {
-                    // Fallback without full name
                   }
-
-                  userMap.set(key, { username: u, fullName });
-                  foundNewInPass = true;
+                } catch {
+                  // Fallback without full name
                 }
+
+                userMap.set(key, { username: u, fullName });
+                foundNewInPass = true;
               }
             });
 
@@ -339,12 +344,11 @@ export async function runLiveBrowserScan(
           const closeBtn =
             dialog?.querySelector<HTMLButtonElement>('button[aria-label="Close"]') ||
             dialog?.querySelector<HTMLButtonElement>('div[role="dialog"] svg[aria-label="Close"]')?.closest('button') ||
-            dialog?.querySelector<HTMLButtonElement>('div[role="dialog"] [aria-label*="Close"]') ||
-            dialog?.querySelector<HTMLButtonElement>('button');
+            dialog?.querySelector<HTMLButtonElement>('div[role="dialog"] [aria-label*="Close"]');
           if (closeBtn) {
             closeBtn.click();
           } else {
-            window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+            window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
           }
 
           // Wait for modal close animation

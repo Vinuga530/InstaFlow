@@ -2,7 +2,7 @@
 
 InstaTrack / InstaFlow is a consumer-grade Chrome Extension (Manifest V3) for Instagram follower relationship analytics, non-follower detection, and historical unfollower tracking.
 
-Built with an offline-first architecture, InstaTrack operates **100% inside your browser**. It requires no account passwords, accesses no session cookies, communicates with zero external backends, and complies strictly with Instagram's Terms of Service and data protection regulations (GDPR / CCPA).
+Built with an offline-first architecture, InstaTrack operates **100% locally inside your browser**. It requires no account passwords, communicates with zero external servers, stores all data in local IndexedDB, and processes relationship analytics entirely on your device.
 
 ---
 
@@ -30,10 +30,9 @@ Built with an offline-first architecture, InstaTrack operates **100% inside your
 
 ## 🔒 Privacy & Security Guarantee
 
-1. **Zero External Backend**: All data processing, ZIP decompression, JSON parsing, and analytics calculations execute 100% locally in your browser.
-2. **No Passwords or Cookies**: InstaTrack never requests your Instagram password, never accesses your cookies, and never automates account actions (no auto-follow / auto-unfollow).
-3. **Zero Risk of Account Ban**: By using Instagram's official "Download Your Information" data export, your account is protected from Instagram's automated bot and third-party login detection.
-4. **Persistent Local Storage**: Snapshots and metadata are stored in your browser's IndexedDB via Dexie.js. Data persists across browser restarts and is never uploaded anywhere.
+1. **Zero External Backend**: All data processing, ZIP decompression, JSON parsing, and analytics calculations execute 100% locally in your browser. No data ever leaves your device.
+2. **No Password Entry Required**: InstaTrack connects to your active browser session on Instagram without ever asking for or handling your account password.
+3. **Persistent Local Storage**: Snapshots and metadata are stored in your browser's IndexedDB via Dexie.js. Data persists across browser restarts and is never uploaded anywhere.
 5. **Full User Control**: Delete individual snapshots or clear all stored data with a single click.
 
 ---

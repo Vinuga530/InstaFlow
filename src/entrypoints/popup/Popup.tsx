@@ -31,6 +31,7 @@ export const Popup: React.FC = () => {
     following,
     notFollowingBack,
     loadSnapshots,
+    selectSnapshot,
     theme,
     setTheme,
     liveStatus,
@@ -126,6 +127,9 @@ export const Popup: React.FC = () => {
 
       setExportResult(result);
       await loadSnapshots();
+      if (result.snapshotId) {
+        await selectSnapshot(result.snapshotId);
+      }
     } catch (err: any) {
       setErrorMsg(err?.message || 'Scan failed. Ensure you are logged into Instagram.');
     } finally {

@@ -28,6 +28,7 @@ export const ImportModal: React.FC = () => {
     isImportModalOpen,
     setImportModalOpen,
     loadSnapshots,
+    selectSnapshot,
     addToast,
     snapshots,
   } = useAppStore();
@@ -165,6 +166,7 @@ export const ImportModal: React.FC = () => {
 
       await saveSnapshot(snapshot, relationships);
       await loadSnapshots();
+      await selectSnapshot(snapshotId);
 
       addToast({
         type: 'success',

@@ -17,7 +17,7 @@ export interface Snapshot {
   newFollowerCount: number; // In comparison to predecessor snapshot
   unfollowerCount: number; // In comparison to predecessor snapshot
   notes?: string;
-  sourceType: 'zip' | 'json' | 'mock' | 'live_browser' | 'live_api';
+  sourceType: 'zip' | 'json' | 'mock' | 'live_browser' | 'live_api' | 'manual';
   fileName?: string;
   previousSnapshotId?: string; // Pointer to the prior snapshot used for diffing
 }

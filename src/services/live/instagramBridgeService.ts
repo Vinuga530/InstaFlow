@@ -412,15 +412,17 @@ export async function inPageUnfollow(targetUserId: string): Promise<{ success: b
  */
 export async function commitScanToSnapshot(scanResult: ScanResult): Promise<string> {
   const now = Date.now();
-  const accountsMap = new Map<string, SnapshotRelationship>();
+  const snapshotId = `snap_live_${now}`;
+  const relationships: Omit<SnapshotRelationship, 'id'>[] = [];
+  const followingSet = new Set(scanResult.following.map((a) => a.username.toLowerCase()));
+  const followerSet = new Set(scanResult.followers.map((a) => a.username.toLowerCase()));
 
   scanResult.followers.forEach((acc) => {
-    accountsMap.set(acc.username.toLowerCase(), {
-      snapshotId: '',
-      accountUsername: acc.username,
-      isFollower: true,
-      isFollowing: false,
-      isMutual: false,
+    const isMutual = followingSet.has(acc.username.toLowerCase());
+    relationships.push({
+      snapshotId,
+      username: acc.username.toLowerCase(),
+      relationshipType: isMutual ? 'mutual' : 'follower',
       profileUrl: acc.profileUrl,
       fullName: acc.fullName,
       timestamp: now,
@@ -428,18 +430,11 @@ export async function commitScanToSnapshot(scanResult: ScanResult): Promise<stri
   });
 
   scanResult.following.forEach((acc) => {
-    const key = acc.username.toLowerCase();
-    const existing = accountsMap.get(key);
-    if (existing) {
-      existing.isFollowing = true;
-      existing.isMutual = true;
-    } else {
-      accountsMap.set(key, {
-        snapshotId: '',
-        accountUsername: acc.username,
-        isFollower: false,
-        isFollowing: true,
-        isMutual: false,
+    if (!followerSet.has(acc.username.toLowerCase())) {
+      relationships.push({
+        snapshotId,
+        username: acc.username.toLowerCase(),
+        relationshipType: 'following',
         profileUrl: acc.profileUrl,
         fullName: acc.fullName,
         timestamp: now,
@@ -448,7 +443,7 @@ export async function commitScanToSnapshot(scanResult: ScanResult): Promise<stri
   });
 
   const snapshot: Snapshot = {
-    id: `snap_live_${now}`,
+    id: snapshotId,
     timestamp: now,
     label: `@${scanResult.viewer.username} (Live Scan)`,
     accountUsername: scanResult.viewer.username,
@@ -461,10 +456,9 @@ export async function commitScanToSnapshot(scanResult: ScanResult): Promise<stri
     unfollowerCount: 0,
     newFollowerCount: 0,
     notes: 'Synchronized via InstaTrack High-Performance Engine',
-    fileFormat: 'json',
   };
 
-  const saved = await saveSnapshot(snapshot, Array.from(accountsMap.values()));
-  return saved.id;
+  await saveSnapshot(snapshot, relationships);
+  return snapshotId;
 }
 

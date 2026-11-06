@@ -1,6 +1,5 @@
 import { defineConfig } from 'wxt';
 import react from '@vitejs/plugin-react';
-import path from 'path';
 
 export default defineConfig({
   srcDir: '.',
@@ -14,18 +13,10 @@ export default defineConfig({
     host_permissions: [
       '*://*.instagram.com/*',
       '*://instagram.com/*',
-      'https://*.instagram.com/*',
-      'https://instagram.com/*',
     ],
     action: {
       default_title: 'InstaTrack',
     },
-    web_accessible_resources: [
-      {
-        resources: ['fonts/*'],
-        matches: ['*://*.instagram.com/*', '*://instagram.com/*'],
-      },
-    ],
     icons: {
       16: '/icons/icon-16.png',
       32: '/icons/icon-32.png',
@@ -34,11 +25,6 @@ export default defineConfig({
     },
   },
   vite: () => ({
-    plugins: [react()],
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname, './src'),
-      },
-    },
+    plugins: [react()] as any,
   }),
 });

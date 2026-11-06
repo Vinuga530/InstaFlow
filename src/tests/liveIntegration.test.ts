@@ -151,15 +151,19 @@ describe('Live Integration Service & Live Mode Data Pipeline', () => {
     ]);
 
     // Mock tab detection to return an active tab
+    const mockActiveTab = {
+      id: 42,
+      url: 'https://www.instagram.com/demo_user/',
+      detectedUsername: 'demo_user',
+      title: 'demo_user on Instagram',
+      active: true,
+    };
     vi.spyOn(liveService, 'detectInstagramTab').mockResolvedValueOnce({
       isTabOpen: true,
       tabCount: 1,
-      activeTab: {
-        id: 42,
-        url: 'https://www.instagram.com/demo_user/',
-        detectedUsername: 'demo_user',
-        title: 'demo_user on Instagram',
-      },
+      activeTab: mockActiveTab,
+      tabs: [mockActiveTab],
+      lastChecked: Date.now(),
     });
 
     (globalThis as any).chrome = {

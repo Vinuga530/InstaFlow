@@ -30,7 +30,7 @@ export class LiveIntegrationService {
    * In browser extension environments, always performs a live query for 100% accurate status.
    */
   async detectInstagramTab(): Promise<TabDetectionState> {
-    if (typeof chrome !== 'undefined' && chrome.tabs?.query) {
+    if (typeof chrome !== 'undefined' && typeof chrome.tabs?.query === 'function') {
       return queryCurrentInstagramTabs();
     }
     const cached = await getCachedTabDetectionState();
