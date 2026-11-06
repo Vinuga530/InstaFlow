@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="igGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f09433"/>
+      <stop offset="25%" stop-color="#e6683c"/>
+      <stop offset="50%" stop-color="#dc2743"/>
+      <stop offset="75%" stop-color="#cc2366"/>
+      <stop offset="100%" stop-color="#bc1888"/>
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.75"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Outer rounded squircle -->
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#igGrad)" filter="url(#shadow)"/>
+
+  <!-- Camera Outer Frame -->
+  <rect x="26" y="26" width="76" height="76" rx="20" fill="none" stroke="url(#ringGrad)" stroke-width="6.5"/>
+
+  <!-- Center Relationship / Eye Node -->
+  <circle cx="64" cy="64" r="18" fill="none" stroke="url(#ringGrad)" stroke-width="6.5"/>
+
+  <!-- Tracking Pulse Dot / Flash -->
+  <circle cx="85" cy="43" r="5" fill="#ffffff"/>
+
+  <!-- Analytics Micro Sparkline Accent -->
+  <path d="M 52 68 L 61 59 L 69 65 L 77 56" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
