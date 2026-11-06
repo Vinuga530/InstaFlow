@@ -82,8 +82,8 @@ export async function runFollowerExporter(
 
       // Helper: read cookie
       const getCookie = (name: string) => {
-        const match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-        return match ? decodeURIComponent(match[3]) : null;
+        const match = document.cookie.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
+        return match ? decodeURIComponent(match[1]) : null;
       };
 
       const csrftoken = getCookie('csrftoken') || '';
@@ -199,6 +199,9 @@ export async function runFollowerExporter(
             } else {
               hasMore = false;
             }
+
+            // Reset stagnant counter on success
+            stagnantRetries = 0;
 
             // High-performance adaptive pacing delay
             if (speedMode === 'fast') {
@@ -318,77 +321,63 @@ export async function runFollowerExporter(
   const allAccounts = Array.from(allAccountsMap.values());
 
   // Save as Snapshot in InstaTrack Dexie DB
-  let snapshotId: string | undefined;
+  const snapshotId = `snap_export_${Date.now()}`;
   try {
     const now = Date.now();
-    const snapFollowers: NormalizedAccount[] = Array.from(followersMap.values()).map((f) => ({
-      username: f.username,
-      fullName: f.fullName,
-      profileUrl: f.profileUrl,
-      timestamp: now,
-    }));
-    const snapFollowing: NormalizedAccount[] = Array.from(followingMap.values()).map((f) => ({
-      username: f.username,
-      fullName: f.fullName,
-      profileUrl: f.profileUrl,
-      timestamp: now,
-    }));
 
-    const relationships: SnapshotRelationship[] = [];
-    const accountsMap = new Map<string, SnapshotRelationship>();
+    // Build SnapshotRelationship records with correct schema fields
+    const relationships: Omit<SnapshotRelationship, 'id'>[] = [];
+    const seenUsernames = new Set<string>();
 
-    snapFollowers.forEach((acc) => {
-      accountsMap.set(acc.username.toLowerCase(), {
-        snapshotId: '',
-        accountUsername: acc.username,
-        isFollower: true,
-        isFollowing: false,
-        isMutual: false,
-        profileUrl: acc.profileUrl,
-        fullName: acc.fullName,
-        timestamp: now,
-      });
-    });
-
-    snapFollowing.forEach((acc) => {
-      const key = acc.username.toLowerCase();
-      const existing = accountsMap.get(key);
-      if (existing) {
-        existing.isFollowing = true;
-        existing.isMutual = true;
-      } else {
-        accountsMap.set(key, {
-          snapshotId: '',
-          accountUsername: acc.username,
-          isFollower: false,
-          isFollowing: true,
-          isMutual: false,
-          profileUrl: acc.profileUrl,
-          fullName: acc.fullName,
+    // Process followers — mark mutuals as 'mutual', others as 'follower'
+    for (const [key, user] of followersMap) {
+      const isMutual = followingMap.has(key);
+      const relType = isMutual ? 'mutual' : 'follower';
+      if (!seenUsernames.has(key)) {
+        seenUsernames.add(key);
+        relationships.push({
+          snapshotId,
+          username: user.username.toLowerCase(),
+          relationshipType: relType as any,
+          profileUrl: user.profileUrl,
+          fullName: user.fullName,
           timestamp: now,
         });
       }
-    });
+    }
+
+    // Process following — only add those not already seen (non-mutuals = 'following')
+    for (const [key, user] of followingMap) {
+      if (!seenUsernames.has(key)) {
+        seenUsernames.add(key);
+        relationships.push({
+          snapshotId,
+          username: user.username.toLowerCase(),
+          relationshipType: 'following',
+          profileUrl: user.profileUrl,
+          fullName: user.fullName,
+          timestamp: now,
+        });
+      }
+    }
 
     const newSnapshot: Snapshot = {
-      id: `snap_export_${now}`,
+      id: snapshotId,
       timestamp: now,
       label: `@${raw.username} (${collectType})`,
       accountUsername: raw.username,
       sourceType: 'live_browser',
-      followerCount: snapFollowers.length,
-      followingCount: snapFollowing.length,
+      followerCount: followersMap.size,
+      followingCount: followingMap.size,
       notFollowingBackCount: notFollowingBack.length,
       fansCount: fans.length,
       mutualCount: mutuals.length,
       unfollowerCount: 0,
       newFollowerCount: 0,
       notes: `Exported via Follower Exporter (${collectType})`,
-      fileFormat: 'json',
     };
 
-    const saved = await saveSnapshot(newSnapshot, Array.from(accountsMap.values()));
-    snapshotId = saved.id;
+    await saveSnapshot(newSnapshot, relationships);
   } catch {
     // Ignore db save errors during standalone export
   }
@@ -413,4 +402,3 @@ export async function runFollowerExporter(
     timestamp: Date.now(),
   };
 }
-
