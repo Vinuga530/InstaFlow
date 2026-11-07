@@ -9,6 +9,7 @@ import {
   getAccountMetadataMap,
   toggleAccountWhitelist,
   updateAccountNotes,
+  removeFollowingRelationship,
 } from '../db';
 import {
   calculateNotFollowingBack,
@@ -19,6 +20,7 @@ import {
 import { compareSnapshots } from '../services/analytics/comparisons';
 import { NormalizedAccount } from '../types/instagram';
 import { liveIntegrationService } from '../services/live/liveIntegrationService';
+import { unfollowInstagramUser } from '../services/live/followerExporterService';
 import { LiveSyncOptions, LiveSyncResult } from '../services/live/liveTypes';
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -469,6 +471,72 @@ export const useAppStore = create<AppState>((set, get) => ({
       title: 'Notes Saved',
       message: `Updated notes for @${username}.`,
     });
+  },
+
+  // Unfollow account directly via active Instagram tab session
+  unfollowAccount: async (targetUsername: string, targetUserId?: string) => {
+    const norm = targetUsername.toLowerCase().trim();
+    const tabId = get().liveStatus?.activeTab?.id;
+    if (!tabId) {
+      get().addToast({
+        type: 'error',
+        title: 'Instagram Tab Required',
+        message: 'Please keep an Instagram tab open to unfollow accounts.',
+      });
+      return false;
+    }
+
+    try {
+      const res = await unfollowInstagramUser({
+        tabId,
+        targetUserId,
+        targetUsername: norm,
+      });
+
+      if (!res.success) {
+        get().addToast({
+          type: 'error',
+          title: 'Unfollow Failed',
+          message: res.error || `Could not unfollow @${targetUsername}`,
+        });
+        return false;
+      }
+
+      // Update Dexie
+      const activeSnap = get().activeSnapshot;
+      if (activeSnap) {
+        await removeFollowingRelationship(activeSnap.id, norm);
+      }
+
+      // Update in-memory lists
+      set((state) => ({
+        following: state.following.filter((u) => u.username.toLowerCase() !== norm),
+        notFollowingBack: state.notFollowingBack.filter((u) => u.username.toLowerCase() !== norm),
+        mutuals: state.mutuals.filter((u) => u.username.toLowerCase() !== norm),
+        activeSnapshot: state.activeSnapshot
+          ? {
+              ...state.activeSnapshot,
+              followingCount: Math.max(0, state.activeSnapshot.followingCount - 1),
+              notFollowingBackCount: Math.max(0, state.activeSnapshot.notFollowingBackCount - 1),
+            }
+          : null,
+      }));
+
+      get().addToast({
+        type: 'success',
+        title: 'Unfollowed',
+        message: `@${targetUsername} has been unfollowed.`,
+      });
+
+      return true;
+    } catch (err: any) {
+      get().addToast({
+        type: 'error',
+        title: 'Unfollow Error',
+        message: err?.message || `Failed to unfollow @${targetUsername}`,
+      });
+      return false;
+    }
   },
 }));
 

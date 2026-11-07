@@ -65,27 +65,51 @@ export const OverviewView: React.FC = () => {
   };
 
   if (!activeSnapshot) {
+    const isTabDetected = !!liveStatus?.isInstagramTabOpen;
+    const detectedUsername = liveStatus?.activeTab?.detectedUsername;
+
     return (
       <div className="p-8 max-w-3xl mx-auto space-y-6">
         <EmptyState
-          icon={<Smile className="w-8 h-8 text-brand-500" />}
-          title="Welcome to InstaTrack"
-          description="Import your official Instagram data export (ZIP or JSON) to see who unfollowed you, discover non-followers, and track relationship trends over time."
-          actionLabel="Import Instagram Data"
-          onAction={() => setImportModalOpen(true)}
+          icon={
+            isTabDetected ? (
+              <Activity className="w-8 h-8 text-emerald-500 animate-pulse" />
+            ) : (
+              <Smile className="w-8 h-8 text-[#E05A47]" />
+            )
+          }
+          title={
+            isTabDetected
+              ? detectedUsername
+                ? `Connected to @${detectedUsername}`
+                : 'Instagram Session Active'
+              : 'Welcome to InstaTrack'
+          }
+          description={
+            isTabDetected
+              ? 'Your Instagram tab is connected. Run a scan to see who unfollowed you and who is not following you back.'
+              : 'Open Instagram in your browser to scan who unfollowed you, or import an Instagram data export.'
+          }
+          actionLabel={isTabDetected ? 'Scan Account Now' : 'Open Live Scanner'}
+          onAction={() => setActiveCategory('live_mode')}
         />
 
-        <div className="flex flex-col items-center pt-2">
-          <p className="text-xs text-neutral-400 mb-2">
-            Want to test out the features with simulated data first?
-          </p>
+        <div className="flex flex-col items-center pt-2 gap-2">
           <Button
-            variant="secondary"
+            variant="ghost"
+            size="sm"
+            leftIcon={<Upload className="w-3.5 h-3.5" />}
+            onClick={() => setImportModalOpen(true)}
+          >
+            Import ZIP / JSON File Instead
+          </Button>
+          <Button
+            variant="ghost"
             size="sm"
             leftIcon={<Sparkles className="w-3.5 h-3.5 text-amber-500" />}
             onClick={handleSeedSample}
           >
-            Load 10k Demo Comparison
+            Load Demo Comparison
           </Button>
         </div>
       </div>

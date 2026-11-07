@@ -116,6 +116,47 @@ export async function getSnapshotRelationships(snapshotId: string): Promise<Snap
 }
 
 /**
+ * Remove an account from following in a snapshot (e.g. after unfollowing)
+ */
+export async function removeFollowingRelationship(
+  snapshotId: string,
+  username: string
+): Promise<void> {
+  const norm = username.toLowerCase().trim();
+  await db.transaction('rw', [db.snapshots, db.snapshot_relationships], async () => {
+    const rels = await db.snapshot_relationships
+      .where('[snapshotId+username]')
+      .equals([snapshotId, norm])
+      .toArray();
+
+    let wasFollowing = false;
+    for (const rel of rels) {
+      if (rel.relationshipType === 'following') {
+        if (rel.id !== undefined) {
+          await db.snapshot_relationships.delete(rel.id);
+          wasFollowing = true;
+        }
+      } else if (rel.relationshipType === 'mutual') {
+        if (rel.id !== undefined) {
+          await db.snapshot_relationships.update(rel.id, { relationshipType: 'follower' });
+          wasFollowing = true;
+        }
+      }
+    }
+
+    if (wasFollowing) {
+      const snap = await db.snapshots.get(snapshotId);
+      if (snap) {
+        await db.snapshots.update(snapshotId, {
+          followingCount: Math.max(0, snap.followingCount - 1),
+          notFollowingBackCount: Math.max(0, snap.notFollowingBackCount - 1),
+        });
+      }
+    }
+  });
+}
+
+/**
  * Fetch account metadata map for fast lookups
  */
 export async function getAccountMetadataMap(): Promise<Map<string, AccountMetadata>> {

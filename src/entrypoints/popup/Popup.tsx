@@ -37,6 +37,7 @@ export const Popup: React.FC = () => {
     liveStatus,
     fetchLiveStatus,
     updateLiveTabState,
+    unfollowAccount,
   } = useAppStore();
 
   // Target account
@@ -138,11 +139,6 @@ export const Popup: React.FC = () => {
   };
 
   const handleUnfollowUser = async (targetUser: { username: string; id?: string }) => {
-    if (!liveStatus?.activeTab?.id) {
-      setErrorMsg('Please keep an Instagram tab open to unfollow accounts.');
-      return;
-    }
-
     const uname = targetUser.username;
     const targetId = (targetUser as any).id || (targetUser as any).userId;
 
@@ -150,69 +146,9 @@ export const Popup: React.FC = () => {
     setErrorMsg(null);
 
     try {
-      const res = await chrome.scripting.executeScript({
-        target: { tabId: liveStatus.activeTab.id },
-        func: async (uid: string, targetUname: string) => {
-          const getCookie = (name: string) => {
-            const match = document.cookie.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
-            return match ? decodeURIComponent(match[1]) : null;
-          };
-          const csrf = getCookie('csrftoken') || '';
-
-          let finalId = uid;
-          if (!finalId) {
-            try {
-              const profileRes = await fetch(
-                `https://www.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(targetUname)}`,
-                {
-                  headers: {
-                    'x-ig-app-id': '936619743392459',
-                    'x-requested-with': 'XMLHttpRequest',
-                    'x-csrftoken': csrf,
-                  },
-                  credentials: 'include',
-                }
-              );
-              if (profileRes.ok) {
-                const pJson = await profileRes.json();
-                finalId = pJson?.data?.user?.id;
-              }
-            } catch {}
-          }
-
-          if (!finalId) {
-            return { success: false, error: 'Could not resolve user ID.' };
-          }
-
-          try {
-            const unfollowRes = await fetch(
-              `https://www.instagram.com/api/v1/friendships/destroy/${finalId}/`,
-              {
-                method: 'POST',
-                headers: {
-                  'x-ig-app-id': '936619743392459',
-                  'x-csrftoken': csrf,
-                  'x-requested-with': 'XMLHttpRequest',
-                  'x-instagram-ajax': '1',
-                  'content-type': 'application/x-www-form-urlencoded',
-                },
-                credentials: 'include',
-              }
-            );
-            const data = await unfollowRes.json();
-            return { success: data?.status === 'ok', data };
-          } catch (e: any) {
-            return { success: false, error: e.message };
-          }
-        },
-        args: [targetId || '', uname],
-      });
-
-      const scriptResult = res?.[0]?.result as any;
-      if (scriptResult?.success) {
+      const ok = await unfollowAccount(uname, targetId);
+      if (ok) {
         setUnfollowedUsers((prev) => new Set([...prev, uname.toLowerCase()]));
-      } else {
-        setErrorMsg(scriptResult?.error || `Could not unfollow @${uname}`);
       }
     } catch (e: any) {
       setErrorMsg(e.message || `Unfollow failed for @${uname}`);

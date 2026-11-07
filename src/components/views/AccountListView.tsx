@@ -23,16 +23,20 @@ import {
   ChevronLeft,
   ChevronRight,
   Smile,
+  UserMinus,
+  Loader2,
 } from 'lucide-react';
 
 interface AccountRowProps {
   account: AccountItem;
   isSelected: boolean;
   isWhitelisted: boolean;
+  isUnfollowing?: boolean;
   notes?: string;
   onToggleSelect: (username: string) => void;
   onToggleWhitelist: (username: string) => void;
   onOpenNotes: (account: AccountItem) => void;
+  onUnfollow?: (username: string) => void;
 }
 
 const AccountRow = React.memo<AccountRowProps>(
@@ -40,10 +44,12 @@ const AccountRow = React.memo<AccountRowProps>(
     account,
     isSelected,
     isWhitelisted,
+    isUnfollowing,
     notes,
     onToggleSelect,
     onToggleWhitelist,
     onOpenNotes,
+    onUnfollow,
   }) => {
     let badgeVariant: BadgeVariant = 'neutral';
     if (account.isUnfollower) {
@@ -129,7 +135,25 @@ const AccountRow = React.memo<AccountRowProps>(
 
         {/* Row Actions */}
         <td className="py-2.5 px-3.5 text-right">
-          <div className="flex items-center justify-end gap-1">
+          <div className="flex items-center justify-end gap-1.5">
+            {account.isFollowing && onUnfollow && (
+              <button
+                onClick={() => onUnfollow(account.username)}
+                disabled={isUnfollowing}
+                className="px-2 py-1 rounded-lg text-[11px] font-bold text-rose-600 dark:text-rose-400 bg-rose-500/10 hover:bg-rose-500/15 border border-rose-500/20 transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
+                title="Unfollow on Instagram"
+              >
+                {isUnfollowing ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <>
+                    <UserMinus className="w-3 h-3" />
+                    <span>Unfollow</span>
+                  </>
+                )}
+              </button>
+            )}
+
             <button
               onClick={() => onToggleWhitelist(account.username)}
               className={`p-1.5 rounded-lg transition-colors ${
@@ -185,7 +209,22 @@ export const AccountListView: React.FC = () => {
     setSelectedAccountForNotes,
     addToast,
     setImportModalOpen,
+    unfollowAccount,
   } = useAppStore();
+
+  const [unfollowingUser, setUnfollowingUser] = useState<string | null>(null);
+
+  const handleUnfollow = useCallback(
+    async (uname: string) => {
+      setUnfollowingUser(uname);
+      try {
+        await unfollowAccount(uname);
+      } finally {
+        setUnfollowingUser(null);
+      }
+    },
+    [unfollowAccount]
+  );
 
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearch = useDebounce(searchInput, 200);
@@ -497,10 +536,12 @@ export const AccountListView: React.FC = () => {
                   account={account}
                   isSelected={selectedSet.has(account.username)}
                   isWhitelisted={isWhitelisted}
+                  isUnfollowing={unfollowingUser === account.username}
                   notes={notes}
                   onToggleSelect={toggleSelectUsername}
                   onToggleWhitelist={toggleWhitelist}
                   onOpenNotes={setSelectedAccountForNotes}
+                  onUnfollow={handleUnfollow}
                 />
               );
             })}

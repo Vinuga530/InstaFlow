@@ -82,6 +82,7 @@ export interface AppState {
   // Account metadata actions
   toggleWhitelist: (username: string) => Promise<void>;
   saveAccountNotes: (username: string, notes: string, tags?: string[]) => Promise<void>;
+  unfollowAccount: (targetUsername: string, targetUserId?: string) => Promise<boolean>;
 
   // Toast notifications
   toasts: ToastMessage[];

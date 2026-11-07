@@ -162,6 +162,36 @@ export async function queryCurrentInstagramTabs(): Promise<TabDetectionState> {
     // Determine the most relevant tab: active tab first, then first available
     const activeTab = validTabs.find((t) => t.active) || (validTabs.length > 0 ? validTabs[0] : null);
 
+    // If active tab has no username from URL (e.g. home feed), probe active session
+    if (
+      typeof chrome !== 'undefined' &&
+      chrome.scripting?.executeScript &&
+      activeTab?.id &&
+      !activeTab.detectedUsername
+    ) {
+      try {
+        const probe = await chrome.scripting.executeScript({
+          target: { tabId: activeTab.id },
+          func: async () => {
+            try {
+              const res = await fetch('/data/shared_data/', { credentials: 'include' });
+              if (res.ok) {
+                const data = await res.json();
+                return data?.config?.viewer?.username || null;
+              }
+            } catch {}
+            return null;
+          },
+        });
+        const found = probe?.[0]?.result;
+        if (found && typeof found === 'string') {
+          activeTab.detectedUsername = normalizeUsername(found);
+        }
+      } catch {
+        // Tab might be in transition or restricted
+      }
+    }
+
     const state: TabDetectionState = {
       isTabOpen: validTabs.length > 0,
       tabCount: validTabs.length,
