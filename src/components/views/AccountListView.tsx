@@ -231,6 +231,11 @@ export const AccountListView: React.FC = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
 
+  // Reset to page 1 whenever category, search, or filter changes
+  React.useEffect(() => {
+    setPage(1);
+  }, [activeCategory, debouncedSearch, whitelistedOnly]);
+
   // 1. Pick dataset based on category
   const rawData: AccountItem[] = useMemo(() => {
     switch (activeCategory) {

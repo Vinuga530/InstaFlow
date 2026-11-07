@@ -1,11 +1,15 @@
 import { AccountItem } from '../../types/analytics';
 
 /**
- * Escapes a cell value for RFC 4180 CSV compliance
+ * Escapes a cell value for RFC 4180 CSV compliance and neutralizes formula injection (CWE-1236)
  */
-function escapeCSVCell(val: unknown): string {
+export function escapeCSVCell(val: unknown): string {
   if (val === null || val === undefined) return '';
-  const str = String(val);
+  let str = String(val);
+  // Defensive CSV Formula Injection Prevention: neutralize formula prefixes
+  if (/^[=\+\-@\t\r]/.test(str)) {
+    str = `'${str}`;
+  }
   if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
     return `"${str.replace(/"/g, '""')}"`;
   }
@@ -13,9 +17,9 @@ function escapeCSVCell(val: unknown): string {
 }
 
 /**
- * Exports a list of accounts to CSV and triggers a client-side download
+ * Builds RFC 4180 compliant CSV string from accounts
  */
-export function exportAccountsToCSV(accounts: AccountItem[], filename: string): void {
+export function generateCSVContent(accounts: AccountItem[]): string {
   const headers = [
     'Username',
     'Profile URL',
@@ -40,11 +44,17 @@ export function exportAccountsToCSV(accounts: AccountItem[], filename: string): 
     (acc.tags || []).join('; '),
   ]);
 
-  const csvContent = [
+  return [
     headers.map(escapeCSVCell).join(','),
     ...rows.map((row) => row.map(escapeCSVCell).join(',')),
   ].join('\r\n');
+}
 
+/**
+ * Exports a list of accounts to CSV and triggers a client-side download
+ */
+export function exportAccountsToCSV(accounts: AccountItem[], filename: string): void {
+  const csvContent = generateCSVContent(accounts);
   downloadBlob(csvContent, filename.endsWith('.csv') ? filename : `${filename}.csv`, 'text/csv;charset=utf-8;');
 }
 

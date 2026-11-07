@@ -129,27 +129,36 @@ export async function removeFollowingRelationship(
       .equals([snapshotId, norm])
       .toArray();
 
-    let wasFollowing = false;
+    let wasNotFollowingBack = false;
+    let wasMutual = false;
     for (const rel of rels) {
       if (rel.relationshipType === 'following') {
         if (rel.id !== undefined) {
           await db.snapshot_relationships.delete(rel.id);
-          wasFollowing = true;
+          wasNotFollowingBack = true;
         }
       } else if (rel.relationshipType === 'mutual') {
         if (rel.id !== undefined) {
           await db.snapshot_relationships.update(rel.id, { relationshipType: 'follower' });
-          wasFollowing = true;
+          wasMutual = true;
         }
       }
     }
 
-    if (wasFollowing) {
+    if (wasNotFollowingBack || wasMutual) {
       const snap = await db.snapshots.get(snapshotId);
       if (snap) {
         await db.snapshots.update(snapshotId, {
           followingCount: Math.max(0, snap.followingCount - 1),
-          notFollowingBackCount: Math.max(0, snap.notFollowingBackCount - 1),
+          notFollowingBackCount: wasNotFollowingBack
+            ? Math.max(0, snap.notFollowingBackCount - 1)
+            : snap.notFollowingBackCount,
+          mutualCount: wasMutual
+            ? Math.max(0, (snap.mutualCount || 0) - 1)
+            : (snap.mutualCount || 0),
+          fansCount: wasMutual
+            ? (snap.fansCount || 0) + 1
+            : (snap.fansCount || 0),
         });
       }
     }

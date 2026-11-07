@@ -3,9 +3,13 @@
  * Generates formatted downloads for CSV, Excel-compatible CSV, and structured JSON.
  */
 
-function escapeCSVCell(val: unknown): string {
+export function escapeCSVCell(val: unknown): string {
   if (val === null || val === undefined) return '';
-  const str = String(val);
+  let str = String(val);
+  // Defensive CSV Formula Injection Prevention (CWE-1236)
+  if (/^[=\+\-@\t\r]/.test(str)) {
+    str = `'${str}`;
+  }
   if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
     return `"${str.replace(/"/g, '""')}"`;
   }

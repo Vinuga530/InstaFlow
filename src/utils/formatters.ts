@@ -2,6 +2,7 @@
  * Format numbers with comma separators (e.g., 12,450)
  */
 export function formatNumber(num: number): string {
+  if (num === null || num === undefined || isNaN(num)) return '0';
   return new Intl.NumberFormat().format(num);
 }
 
@@ -9,32 +10,45 @@ export function formatNumber(num: number): string {
  * Format date in a clean readable form (e.g., "Nov 3, 2026")
  */
 export function formatDate(timestamp: number | string | Date): string {
-  const d = new Date(timestamp);
-  return d.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+  if (!timestamp) return '—';
+  try {
+    const d = new Date(timestamp);
+    if (isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  } catch {
+    return '—';
+  }
 }
 
 /**
  * Format date with time (e.g., "Nov 3, 2026, 2:30 PM")
  */
 export function formatDateTime(timestamp: number | string | Date): string {
-  const d = new Date(timestamp);
-  return d.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  });
+  if (!timestamp) return '—';
+  try {
+    const d = new Date(timestamp);
+    if (isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  } catch {
+    return '—';
+  }
 }
 
 /**
  * Friendly relative time formatter ("3 days ago", "just now")
  */
 export function formatRelativeTime(timestamp: number): string {
+  if (!timestamp || isNaN(timestamp) || timestamp <= 0) return 'never';
   const diffSec = Math.floor((Date.now() - timestamp) / 1000);
   if (diffSec < 60) return 'just now';
   const diffMin = Math.floor(diffSec / 60);

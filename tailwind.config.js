@@ -57,9 +57,8 @@ export default {
         logo: ['"Cassandra"', 'cursive', 'sans-serif'],
         cassandra: ['"Cassandra"', 'cursive', 'sans-serif'],
         fredoka: ['"Fredoka One"', 'cursive', 'sans-serif'],
-        display: ['"Fredoka One"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        display: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', 'sans-serif'],
         sans: [
-          '"Fredoka One"',
           '-apple-system',
           'BlinkMacSystemFont',
           '"SF Pro Text"',

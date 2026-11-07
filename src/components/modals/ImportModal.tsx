@@ -4,7 +4,7 @@ import { Button } from '../common/Button';
 import { ingestInstagramFiles } from '../../services/ingestion/fileIngestionService';
 import { calculateSnapshotMetrics } from '../../services/analytics/engine';
 import { officialExportAdapter } from '../../services/browser-adapter/instagramAdapter';
-import { saveSnapshot } from '../../db';
+import { saveSnapshot, getSnapshotRelationships } from '../../db';
 import { Snapshot, SnapshotRelationship } from '../../types/database';
 import { ParsedInstagramData } from '../../types/instagram';
 import { formatDate } from '../../utils/formatters';
@@ -107,15 +107,40 @@ export const ImportModal: React.FC = () => {
       const now = Date.now();
       const prevSnapshot = snapshots.length > 0 ? snapshots[0] : undefined;
 
+      const followerSet = new Set(stagedData.followers.map((f) => f.username.toLowerCase()));
+      const followingSet = new Set(stagedData.following.map((f) => f.username.toLowerCase()));
+
+      let newFollowerCount = 0;
+      let unfollowerCount = 0;
+
+      if (prevSnapshot) {
+        try {
+          const prevRels = await getSnapshotRelationships(prevSnapshot.id);
+          const prevFollowerSet = new Set<string>();
+          for (const r of prevRels) {
+            if (r.relationshipType === 'follower' || r.relationshipType === 'mutual') {
+              prevFollowerSet.add(r.username.toLowerCase());
+            }
+          }
+          for (const p of prevFollowerSet) {
+            if (!followerSet.has(p)) {
+              unfollowerCount++;
+            }
+          }
+          for (const cur of followerSet) {
+            if (!prevFollowerSet.has(cur)) {
+              newFollowerCount++;
+            }
+          }
+        } catch {}
+      }
+
       const metrics = calculateSnapshotMetrics(
         stagedData.followers,
         stagedData.following,
-        0,
-        0
+        newFollowerCount,
+        unfollowerCount
       );
-
-      const followerSet = new Set(stagedData.followers.map((f) => f.username.toLowerCase()));
-      const followingSet = new Set(stagedData.following.map((f) => f.username.toLowerCase()));
 
       const relationships: Omit<SnapshotRelationship, 'id'>[] = [];
 
@@ -156,8 +181,8 @@ export const ImportModal: React.FC = () => {
         notFollowingBackCount: metrics.notFollowingBackCount,
         fansCount: metrics.fansCount,
         mutualCount: metrics.mutualCount,
-        newFollowerCount: 0,
-        unfollowerCount: 0,
+        newFollowerCount,
+        unfollowerCount,
         notes: snapshotNotes.trim() || undefined,
         sourceType: stagedData.sourceType,
         fileName: stagedData.sourceFileName,

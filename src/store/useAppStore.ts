@@ -268,6 +268,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       // Separate followers and following
       const rawFollowers: NormalizedAccount[] = [];
       const rawFollowing: NormalizedAccount[] = [];
+      const followerSet = new Set<string>();
+      const followingSet = new Set<string>();
 
       for (const rel of rawRels) {
         const item: NormalizedAccount = {
@@ -277,16 +279,16 @@ export const useAppStore = create<AppState>((set, get) => ({
           timestamp: rel.timestamp,
         };
 
+        const lower = rel.username.toLowerCase();
         if (rel.relationshipType === 'follower' || rel.relationshipType === 'mutual') {
           rawFollowers.push(item);
+          followerSet.add(lower);
         }
         if (rel.relationshipType === 'following' || rel.relationshipType === 'mutual') {
           rawFollowing.push(item);
+          followingSet.add(lower);
         }
       }
-
-      const followerSet = new Set(rawFollowers.map((f) => f.username.toLowerCase()));
-      const followingSet = new Set(rawFollowing.map((f) => f.username.toLowerCase()));
 
       const rawNotFollowingBack = calculateNotFollowingBack(rawFollowers, rawFollowing);
       const rawFans = calculateFans(rawFollowers, rawFollowing);
@@ -398,21 +400,22 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Whitelist toggle
   toggleWhitelist: async (username: string) => {
-    const isWhitelisted = await toggleAccountWhitelist(username);
+    const norm = username.toLowerCase().trim();
+    const isWhitelisted = await toggleAccountWhitelist(norm);
     const updatedMap = new Map(get().accountMetadataMap);
-    const existing = updatedMap.get(username) || {
-      username,
+    const existing = updatedMap.get(norm) || {
+      username: norm,
       isWhitelisted: false,
       tags: [],
       firstSeen: Date.now(),
       lastSeen: Date.now(),
     };
-    updatedMap.set(username, { ...existing, isWhitelisted });
+    updatedMap.set(norm, { ...existing, isWhitelisted });
 
     // Update in-memory lists
     const updateList = (list: AccountItem[]) =>
       list.map((item) =>
-        item.username.toLowerCase() === username.toLowerCase()
+        item.username.toLowerCase() === norm
           ? { ...item, isWhitelisted }
           : item
       );
@@ -437,20 +440,21 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Save notes & tags
   saveAccountNotes: async (username: string, notes: string, tags: string[] = []) => {
-    await updateAccountNotes(username, notes, tags);
+    const norm = username.toLowerCase().trim();
+    await updateAccountNotes(norm, notes, tags);
     const updatedMap = new Map(get().accountMetadataMap);
-    const existing = updatedMap.get(username) || {
-      username,
+    const existing = updatedMap.get(norm) || {
+      username: norm,
       isWhitelisted: false,
       tags: [],
       firstSeen: Date.now(),
       lastSeen: Date.now(),
     };
-    updatedMap.set(username, { ...existing, notes, tags });
+    updatedMap.set(norm, { ...existing, notes, tags });
 
     const updateList = (list: AccountItem[]) =>
       list.map((item) =>
-        item.username.toLowerCase() === username.toLowerCase()
+        item.username.toLowerCase() === norm
           ? { ...item, notes, tags }
           : item
       );
@@ -508,19 +512,56 @@ export const useAppStore = create<AppState>((set, get) => ({
         await removeFollowingRelationship(activeSnap.id, norm);
       }
 
+      const wasMutual = get().mutuals.some((u) => u.username.toLowerCase() === norm);
+      const targetInFollowers = get().followers.find((u) => u.username.toLowerCase() === norm);
+
       // Update in-memory lists
-      set((state) => ({
-        following: state.following.filter((u) => u.username.toLowerCase() !== norm),
-        notFollowingBack: state.notFollowingBack.filter((u) => u.username.toLowerCase() !== norm),
-        mutuals: state.mutuals.filter((u) => u.username.toLowerCase() !== norm),
-        activeSnapshot: state.activeSnapshot
+      set((state) => {
+        const following = state.following.filter((u) => u.username.toLowerCase() !== norm);
+        const notFollowingBack = state.notFollowingBack.filter((u) => u.username.toLowerCase() !== norm);
+        const mutuals = state.mutuals.filter((u) => u.username.toLowerCase() !== norm);
+
+        let fans = state.fans;
+        let followers = state.followers;
+
+        if (wasMutual && targetInFollowers) {
+          const updatedTarget: AccountItem = {
+            ...targetInFollowers,
+            isFollowing: false,
+            isFollower: true,
+            isMutual: false,
+          };
+          fans = [updatedTarget, ...state.fans];
+          followers = state.followers.map((u) =>
+            u.username.toLowerCase() === norm ? updatedTarget : u
+          );
+        }
+
+        const activeSnapshot = state.activeSnapshot
           ? {
               ...state.activeSnapshot,
               followingCount: Math.max(0, state.activeSnapshot.followingCount - 1),
-              notFollowingBackCount: Math.max(0, state.activeSnapshot.notFollowingBackCount - 1),
+              notFollowingBackCount: wasMutual
+                ? state.activeSnapshot.notFollowingBackCount
+                : Math.max(0, state.activeSnapshot.notFollowingBackCount - 1),
+              mutualCount: wasMutual
+                ? Math.max(0, (state.activeSnapshot.mutualCount || 0) - 1)
+                : (state.activeSnapshot.mutualCount || 0),
+              fansCount: wasMutual
+                ? (state.activeSnapshot.fansCount || 0) + 1
+                : (state.activeSnapshot.fansCount || 0),
             }
-          : null,
-      }));
+          : null;
+
+        return {
+          following,
+          notFollowingBack,
+          mutuals,
+          fans,
+          followers,
+          activeSnapshot,
+        };
+      });
 
       get().addToast({
         type: 'success',

@@ -758,12 +758,22 @@ export default defineContentScript({
       if (message?.type === 'UNFOLLOW_USER') {
         (async () => {
           const targetId = message.userId;
-          const csrf = getCookie('csrftoken') || '';
+          let csrf = getCookie('csrftoken') || '';
+          if (!csrf) {
+            try {
+              const sRes = await fetch('/data/shared_data/', { credentials: 'include' });
+              if (sRes.ok) {
+                const sData = await sRes.json();
+                csrf = sData?.config?.csrf_token || '';
+              }
+            } catch {}
+          }
           try {
             const res = await fetch(`https://www.instagram.com/api/v1/friendships/destroy/${targetId}/`, {
               method: 'POST',
               headers: {
                 'x-ig-app-id': '936619743392459',
+                'x-asbd-id': '129477',
                 'x-csrftoken': csrf,
                 'x-requested-with': 'XMLHttpRequest',
                 'x-instagram-ajax': '1',

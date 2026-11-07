@@ -119,11 +119,12 @@ export async function runInPageScan(
     return match ? decodeURIComponent(match[1]) : null;
   };
 
-  const csrfToken = getCookie('csrftoken') || '';
+  let csrfToken = getCookie('csrftoken') || '';
   const dsUserId = getCookie('ds_user_id') || '';
 
   const igHeaders = (): Record<string, string> => ({
     'x-ig-app-id': APP_ID,
+    'x-asbd-id': '129477',
     'x-csrftoken': csrfToken,
     'x-requested-with': 'XMLHttpRequest',
     'x-instagram-ajax': '1',
@@ -139,6 +140,9 @@ export async function runInPageScan(
     const sharedDataRes = await fetch('/data/shared_data/', { credentials: 'include' });
     if (sharedDataRes.ok) {
       const data = await sharedDataRes.json();
+      if (data?.config?.csrf_token) {
+        csrfToken = data.config.csrf_token;
+      }
       if (data?.config?.viewer) {
         viewer = {
           id: String(data.config.viewerId || data.config.viewer.id || dsUserId),
@@ -378,13 +382,23 @@ export async function inPageUnfollow(targetUserId: string): Promise<{ success: b
     return match ? decodeURIComponent(match[1]) : null;
   };
 
-  const csrfToken = getCookie('csrftoken') || '';
+  let csrfToken = getCookie('csrftoken') || '';
+  if (!csrfToken) {
+    try {
+      const sRes = await fetch('/data/shared_data/', { credentials: 'include' });
+      if (sRes.ok) {
+        const sData = await sRes.json();
+        csrfToken = sData?.config?.csrf_token || '';
+      }
+    } catch {}
+  }
 
   try {
     const res = await fetch(`https://www.instagram.com/api/v1/friendships/destroy/${targetUserId}/`, {
       method: 'POST',
       headers: {
         'x-ig-app-id': APP_ID,
+        'x-asbd-id': '129477',
         'x-csrftoken': csrfToken,
         'x-requested-with': 'XMLHttpRequest',
         'x-instagram-ajax': '1',

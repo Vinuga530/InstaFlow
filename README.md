@@ -23,7 +23,7 @@ Built with an offline-first architecture, InstaTrack operates **100% locally ins
 - **Account Notes & Whitelisting**: Star trusted accounts to exclude them from cleanup alerts and add custom tags and notes.
 - **Bulk Operations**: Select visible accounts, copy usernames to clipboard with one click, or export to CSV / JSON.
 - **Local Data Export & Backup**: Export any category or snapshot to RFC 4180 CSV or structured JSON. Full backup and restore of the local IndexedDB database.
-- **Apple HIG & Comfy Minimalist Aesthetic**: Designed with Apple Human Interface Guidelines, warm oat canvas (`#FAF8F5`), warm espresso dark mode (`#121110`), squircle contours (`rounded-2xl`, `rounded-3xl`), and custom local **Fredoka One** display typography.
+- **Apple HIG & Minimalist Aesthetic**: Designed with Apple Human Interface Guidelines, warm oat canvas (`#FAF8F5`), warm espresso dark mode (`#121110`), squircle contours (`rounded-2xl`, `rounded-3xl`), crisp native system typography (`-apple-system`, `SF Pro`), and custom calligraphy branding (`Cassandra`) strictly for the `InstaTrack` logo.
 - **Extension Popup & Dedicated Dashboard**: Fast access via toolbar popup (real-time tab indicator, quick metrics, sync shortcuts) and a full dedicated dashboard page for deep analysis.
 
 ---
@@ -31,9 +31,19 @@ Built with an offline-first architecture, InstaTrack operates **100% locally ins
 ## 🔒 Privacy & Security Guarantee
 
 1. **Zero External Backend**: All data processing, ZIP decompression, JSON parsing, and analytics calculations execute 100% locally in your browser. No data ever leaves your device.
-2. **No Password Entry Required**: InstaTrack connects to your active browser session on Instagram without ever asking for or handling your account password.
-3. **Persistent Local Storage**: Snapshots and metadata are stored in your browser's IndexedDB via Dexie.js. Data persists across browser restarts and is never uploaded anywhere.
+2. **Defensive CSV Protection (CWE-1236)**: All CSV and Excel downloads are sanitized to neutralize spreadsheet formula execution vectors.
+3. **No Password Entry Required**: InstaTrack connects to your active browser session on Instagram without ever asking for or handling your account password.
+4. **Persistent Local Storage**: Snapshots and metadata are stored in your browser's IndexedDB via Dexie.js. Data persists across browser restarts and is never uploaded anywhere.
 5. **Full User Control**: Delete individual snapshots or clear all stored data with a single click.
+
+---
+
+## 📚 Technical Documentation
+
+- [**System Architecture**](ARCHITECTURE.md) — Comprehensive technical architecture, runtime contexts, data pipelines, and Dexie schema.
+- [**Codebase Audit & Security Report**](CODEBASE_AUDIT.md) — Detailed engineering audit, root cause analyses, bug fixes, and security review.
+- [**Quality Assurance & Test Report**](TEST_REPORT.md) — Full test execution matrix, 58 unit tests, TypeScript compilation, and build verification.
+- [**Changelog**](CHANGELOG.md) — Historical release notes, features, fixes, and optimizations.
 
 ---
 
@@ -64,8 +74,8 @@ InstaFlow/
 ├── vitest.config.ts               # Unit test configuration
 ├── tailwind.config.js             # Tailwind design tokens & themes
 ├── postcss.config.js              # PostCSS plugins
-├── index.html                     # Root dashboard entry
 ├── public/                        # Extension icons & static assets
+│   ├── fonts/                     # Branding & display typography
 │   └── icons/
 │       ├── icon-16.png
 │       ├── icon-32.png
@@ -75,6 +85,7 @@ InstaFlow/
 └── src/
     ├── entrypoints/
     │   ├── background.ts          # Manifest V3 service worker
+    │   ├── content.ts             # Content script & in-tab session bridge
     │   ├── popup/                 # Compact extension toolbar popup
     │   │   ├── index.html
     │   │   ├── main.tsx
