@@ -163,3 +163,4 @@ db.version(2).stores({
    - Avoids asking for or storing user passwords.
    - Operates through authorized browser cookie and `/data/shared_data/` sessions within user-granted tab permissions.
    - Enforces adaptive pacing and rate-limit backoff ($850\text{ms} - 2000\text{ms}$ delays) to ensure session safety.
+

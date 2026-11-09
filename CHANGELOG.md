@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.1] - 2026-11-09
+
+### Added
+- **New Brand Identity & Logo Tile**: Integrated the dark obsidian rounded square tile monogram across all UI entrypoints via the dedicated `<BrandLogo />` component.
+- **High-DPI Extension Icons**: Generated production rasterized icons (`icon-16.png`, `icon-32.png`, `icon-48.png`, `icon-128.png`, and `icon.svg`) matching the new brand identity.
+- **In-Tab Floating HUD Branding**: Updated the floating Instagram in-page capsule badge with the obsidian monogram mark.
+
 ## [1.1.0] - 2026-11-08
 
 ### Added
@@ -42,3 +49,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dexie.js (IndexedDB) local persistence for snapshots, relationships, and user account metadata.
 - Interactive analytics dashboard with Recharts visualizations, search, sorting, and whitelisting.
 - Toolbar popup with live tab connection indicator and quick metrics.
+

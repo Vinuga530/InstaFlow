@@ -153,3 +153,4 @@ i Building chrome-mv3 for production with Vite 6.4.5
 ```
 
 All Manifest V3 assets are bundled, validated, and ready for deployment to the Chrome Web Store.
+

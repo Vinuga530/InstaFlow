@@ -9,6 +9,7 @@ import {
   FollowerExportResult,
 } from '../../services/live/followerExporterService';
 import { downloadAccountsAsCSV } from '../../services/export/downloadService';
+import { BrandLogo } from '../../components/common/BrandLogo';
 import {
   ExternalLink,
   Sun,
@@ -243,13 +244,7 @@ export const Popup: React.FC = () => {
       {/* ─── Header ─── */}
       <header className="flex items-center justify-between pb-2 border-b border-black/[0.06] dark:border-white/[0.06] shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#E05A47] via-[#D94E34] to-[#C93B20] flex items-center justify-center text-white shadow-sm">
-            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-            </svg>
-          </div>
+          <BrandLogo className="w-7 h-7 rounded-lg shadow-sm shrink-0 overflow-hidden" size={28} />
           <span className="font-logo text-base tracking-wide text-[#292522] dark:text-[#F7F4EF]">
             InstaTrack
           </span>

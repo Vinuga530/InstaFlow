@@ -2,6 +2,7 @@ import React from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { RelationshipCategory } from '../../types/analytics';
 import { cn } from '../../utils/cn';
+import { BrandLogo } from '../common/BrandLogo';
 import {
   LayoutDashboard,
   Activity,
@@ -158,13 +159,7 @@ export const Sidebar: React.FC = () => {
       {/* Brand & Account Header */}
       <div className="p-4 flex items-center justify-between border-b border-black/[0.05] dark:border-white/[0.06]">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-amber-400 via-rose-500 to-purple-600 flex items-center justify-center text-white shadow-cozy shrink-0">
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-            </svg>
-          </div>
+          <BrandLogo className="w-8 h-8 rounded-xl shadow-cozy shrink-0 overflow-hidden" size={32} />
           <div className="min-w-0">
             <h1 className="text-base font-logo font-normal tracking-wide text-neutral-900 dark:text-neutral-50 truncate">
               InstaTrack
