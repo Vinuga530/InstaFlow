@@ -54,3 +54,4 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({ className = 'w-7 h-7', siz
     </svg>
   );
 };
+

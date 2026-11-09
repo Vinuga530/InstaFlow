@@ -63,18 +63,16 @@ export function formatRelativeTime(timestamp: number): string {
 }
 
 /**
- * Generates deterministic pastel/gradient color classes for username monograms
+ * Generates deterministic understated color classes for username monograms
  */
 export function getAvatarGradient(username: string): string {
-  const gradients = [
-    'from-rose-500 to-amber-500',
-    'from-purple-600 to-pink-500',
-    'from-blue-500 to-teal-400',
-    'from-indigo-500 to-purple-500',
-    'from-emerald-500 to-teal-600',
-    'from-orange-500 to-rose-500',
-    'from-fuchsia-600 to-pink-600',
-    'from-violet-600 to-indigo-600',
+  const tones = [
+    'bg-[#71806C]/15 dark:bg-[#899783]/20 text-[#505D4A] dark:text-[#C5D2C0] border border-[#71806C]/25 dark:border-[#899783]/30',
+    'bg-[#686E64]/15 dark:bg-[#A6AA9D]/20 text-[#4A5046] dark:text-[#D4D8CB] border border-[#686E64]/20 dark:border-[#A6AA9D]/25',
+    'bg-[#9E7E43]/15 dark:bg-[#C0A268]/20 text-[#705527] dark:text-[#E2D2AF] border border-[#9E7E43]/20 dark:border-[#C0A268]/25',
+    'bg-[#5A6755]/15 dark:bg-[#9BA897]/20 text-[#3E493A] dark:text-[#D0DDD0] border border-[#5A6755]/20 dark:border-[#9BA897]/25',
+    'bg-[#7D786D]/15 dark:bg-[#B3ADA1]/20 text-[#565147] dark:text-[#E0DDD5] border border-[#7D786D]/20 dark:border-[#B3ADA1]/25',
+    'bg-[#8A7968]/15 dark:bg-[#C2B2A2]/20 text-[#615243] dark:text-[#E7DFD6] border border-[#8A7968]/20 dark:border-[#C2B2A2]/25',
   ];
 
   let hash = 0;
@@ -82,7 +80,7 @@ export function getAvatarGradient(username: string): string {
     hash = username.charCodeAt(i) + ((hash << 5) - hash);
   }
 
-  const index = Math.abs(hash) % gradients.length;
-  return gradients[index];
+  const index = Math.abs(hash) % tones.length;
+  return tones[index];
 }
 

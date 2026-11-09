@@ -57,59 +57,59 @@ export const AccountNotesModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md rounded-3xl border border-black/[0.06] dark:border-white/[0.08] bg-white/95 dark:bg-[#1B1918]/95 backdrop-blur-2xl shadow-cozy-lg overflow-hidden p-6 space-y-5">
+      <div className="relative w-full max-w-md rounded-3xl border border-[#D5D2C5] dark:border-[#343B35] bg-[#EAE8DF] dark:bg-[#202421] shadow-2xl overflow-hidden p-6 space-y-5">
         {/* Header with Account info */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Avatar username={selectedAccountForNotes.username} size="md" />
             <div>
               <div className="flex items-center gap-1.5">
-                <h3 className="font-fredoka text-base text-[#292522] dark:text-[#F7F4EF]">
+                <h3 className="font-semibold text-base text-[#242823] dark:text-[#F0EEE6]">
                   @{selectedAccountForNotes.username}
                 </h3>
                 <a
                   href={selectedAccountForNotes.profileUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-[#8C827A] hover:text-[#E05A47] transition-colors"
+                  className="text-[#686E64] dark:text-[#A6AA9D] hover:text-[#71806C] dark:hover:text-[#899783] transition-colors"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
-              <p className="text-[11px] text-[#8C827A] dark:text-[#A8A199] font-medium">
+              <p className="text-[11px] text-[#686E64] dark:text-[#A6AA9D] font-medium">
                 Custom Account Notes & Whitelist
               </p>
             </div>
           </div>
           <button
             onClick={() => setSelectedAccountForNotes(null)}
-            className="p-2 rounded-xl text-[#8C827A] hover:text-[#292522] dark:hover:text-[#F7F4EF] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all"
+            className="p-2 rounded-xl text-[#686E64] dark:text-[#A6AA9D] hover:text-[#242823] dark:hover:text-[#F0EEE6] hover:bg-[#E2DFD6]/60 dark:hover:bg-[#272C28]/60 transition-all"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Whitelist quick toggle */}
-        <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#FAF8F5] dark:bg-[#141312] border border-black/[0.04] dark:border-white/[0.04]">
+        <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#F5F3EC] dark:bg-[#151716] border border-[#D5D2C5] dark:border-[#343B35]">
           <div className="flex items-center gap-2.5">
             <Star
               className={`w-4 h-4 ${
                 selectedAccountForNotes.isWhitelisted
-                  ? 'text-amber-500 fill-amber-500'
-                  : 'text-[#8C827A] dark:text-[#A8A199]'
+                  ? 'text-[#9E7E43] fill-[#9E7E43] dark:text-[#CBB279] dark:fill-[#CBB279]'
+                  : 'text-[#686E64] dark:text-[#A6AA9D]'
               }`}
             />
-            <span className="text-xs font-bold text-[#292522] dark:text-[#F7F4EF]">
+            <span className="text-xs font-semibold text-[#242823] dark:text-[#F0EEE6]">
               Whitelisted VIP Account
             </span>
           </div>
           <button
             type="button"
             onClick={() => toggleWhitelist(selectedAccountForNotes.username)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all active:scale-[0.97] ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all active:scale-[0.97] ${
               selectedAccountForNotes.isWhitelisted
-                ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30 shadow-cozy shadow-amber-500/10'
-                : 'bg-white dark:bg-[#1B1918] text-[#59534E] dark:text-[#D1CBC5] border-black/[0.08] dark:border-white/[0.08] hover:bg-black/[0.02] dark:hover:bg-white/[0.04]'
+                ? 'bg-[#9E7E43]/15 text-[#9E7E43] dark:text-[#CBB279] border-[#9E7E43]/30'
+                : 'bg-[#EAE8DF] dark:bg-[#202421] text-[#686E64] dark:text-[#A6AA9D] border-[#D5D2C5] dark:border-[#343B35] hover:bg-[#E2DFD6]/60 dark:hover:bg-[#272C28]/60'
             }`}
           >
             {selectedAccountForNotes.isWhitelisted ? 'Whitelisted' : 'Not Whitelisted'}
@@ -118,7 +118,7 @@ export const AccountNotesModal: React.FC = () => {
 
         {/* Notes Textarea */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-bold text-[#292522] dark:text-[#F7F4EF]">
+          <label className="block text-xs font-semibold text-[#242823] dark:text-[#F0EEE6]">
             Personal Notes
           </label>
           <textarea
@@ -126,13 +126,13 @@ export const AccountNotesModal: React.FC = () => {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="e.g. Met at tech conference, personal friend, brand partner..."
-            className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-[#1B1918] text-[#292522] dark:text-[#F7F4EF] placeholder-[#8C827A]/60 dark:placeholder-[#A8A199]/60 focus:outline-none focus:ring-2 focus:ring-[#E05A47]/30 resize-none font-medium leading-relaxed"
+            className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#D5D2C5] dark:border-[#343B35] bg-[#F5F3EC] dark:bg-[#151716] text-[#242823] dark:text-[#F0EEE6] placeholder-[#686E64]/60 dark:placeholder-[#A6AA9D]/60 focus:outline-none focus:ring-1 focus:ring-[#71806C] dark:focus:ring-[#899783] resize-none font-medium leading-relaxed"
           />
         </div>
 
         {/* Tags input */}
         <div className="space-y-2">
-          <label className="block text-xs font-bold text-[#292522] dark:text-[#F7F4EF]">
+          <label className="block text-xs font-semibold text-[#242823] dark:text-[#F0EEE6]">
             Custom Tags
           </label>
           <div className="flex gap-2">
@@ -142,7 +142,7 @@ export const AccountNotesModal: React.FC = () => {
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
               placeholder="e.g. friend, colleague, creator"
-              className="flex-1 px-3.5 py-2 text-xs rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-[#1B1918] text-[#292522] dark:text-[#F7F4EF] placeholder-[#8C827A]/60 dark:placeholder-[#A8A199]/60 focus:outline-none focus:ring-2 focus:ring-[#E05A47]/30 font-medium"
+              className="flex-1 px-3.5 py-2 text-xs rounded-xl border border-[#D5D2C5] dark:border-[#343B35] bg-[#F5F3EC] dark:bg-[#151716] text-[#242823] dark:text-[#F0EEE6] placeholder-[#686E64]/60 dark:placeholder-[#A6AA9D]/60 focus:outline-none focus:ring-1 focus:ring-[#71806C] dark:focus:ring-[#899783] font-medium"
             />
             <Button variant="secondary" size="sm" onClick={handleAddTag}>
               Add Tag
@@ -154,12 +154,12 @@ export const AccountNotesModal: React.FC = () => {
               {tags.map((t) => (
                 <span
                   key={t}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-[#E05A47]/10 text-[#E05A47] dark:text-[#E05A47] font-bold border border-[#E05A47]/20"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-[#71806C]/15 text-[#71806C] dark:text-[#899783] font-medium border border-[#71806C]/30"
                 >
                   <span>#{t}</span>
                   <button
                     onClick={() => handleRemoveTag(t)}
-                    className="hover:text-[#C93B20] text-xs font-bold transition-colors"
+                    className="hover:text-[#242823] dark:hover:text-[#F0EEE6] text-xs font-bold transition-colors"
                   >
                     ×
                   </button>

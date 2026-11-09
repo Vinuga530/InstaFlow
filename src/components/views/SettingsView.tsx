@@ -133,22 +133,22 @@ export const SettingsView: React.FC = () => {
   return (
     <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300">
       <div>
-        <h2 className="font-fredoka text-xl text-[#292522] dark:text-[#F7F4EF]">
+        <h2 className="font-medium tracking-tight text-xl text-[#242823] dark:text-[#F0EEE6]">
           App Preferences & Storage
         </h2>
-        <p className="text-xs text-[#8C827A] dark:text-[#A8A199] mt-0.5">
+        <p className="text-xs text-[#686E64] dark:text-[#A6AA9D] mt-0.5">
           Customize your display experience, backup your data, or inspect privacy guarantees.
         </p>
       </div>
 
       {/* Appearance Section */}
-      <div className="p-6 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-[#1B1918] shadow-cozy space-y-4">
+      <div className="p-6 rounded-2xl border border-[#D5D2C5] dark:border-[#343B35] bg-[#EAE8DF] dark:bg-[#202421] space-y-4">
         <div>
-          <h3 className="font-fredoka text-base text-[#292522] dark:text-[#F7F4EF] flex items-center gap-2">
+          <h3 className="font-semibold text-base text-[#242823] dark:text-[#F0EEE6] flex items-center gap-2">
             <span>Appearance & Theme</span>
           </h3>
-          <p className="text-xs text-[#8C827A] dark:text-[#A8A199] mt-0.5">
-            Choose your preferred aesthetic. InstaTrack supports soft oat Light mode and warm espresso Dark mode.
+          <p className="text-xs text-[#686E64] dark:text-[#A6AA9D] mt-0.5">
+            Choose your preferred aesthetic. InstaTrack uses the Quiet Precision palette in light and dark modes.
           </p>
         </div>
 
@@ -157,11 +157,11 @@ export const SettingsView: React.FC = () => {
             onClick={() => setTheme('light')}
             className={`flex items-center justify-center gap-2.5 p-3 rounded-xl border text-xs font-semibold transition-all active:scale-[0.97] ${
               theme === 'light'
-                ? 'border-[#E05A47] bg-[#E05A47]/10 text-[#E05A47] shadow-cozy shadow-[#E05A47]/10 ring-2 ring-[#E05A47]/20'
-                : 'border-black/[0.06] dark:border-white/[0.08] text-[#59534E] dark:text-[#D1CBC5] bg-[#FAF8F5] dark:bg-[#141312] hover:bg-black/[0.02] dark:hover:bg-white/[0.04]'
+                ? 'border-[#71806C] dark:border-[#899783] bg-[#71806C]/15 dark:bg-[#899783]/20 text-[#242823] dark:text-[#F0EEE6] ring-1 ring-[#71806C]/30'
+                : 'border-[#D5D2C5] dark:border-[#343B35] text-[#686E64] dark:text-[#A6AA9D] bg-[#F5F3EC] dark:bg-[#151716] hover:bg-[#E2DFD6]/60 dark:hover:bg-[#272C28]/60'
             }`}
           >
-            <Sun className="w-4 h-4 text-amber-500" />
+            <Sun className="w-4 h-4 text-[#9E7E43] dark:text-[#CBB279]" />
             <span>Light</span>
           </button>
 
@@ -169,11 +169,11 @@ export const SettingsView: React.FC = () => {
             onClick={() => setTheme('dark')}
             className={`flex items-center justify-center gap-2.5 p-3 rounded-xl border text-xs font-semibold transition-all active:scale-[0.97] ${
               theme === 'dark'
-                ? 'border-[#E05A47] bg-[#E05A47]/10 text-[#E05A47] shadow-cozy shadow-[#E05A47]/10 ring-2 ring-[#E05A47]/20'
-                : 'border-black/[0.06] dark:border-white/[0.08] text-[#59534E] dark:text-[#D1CBC5] bg-[#FAF8F5] dark:bg-[#141312] hover:bg-black/[0.02] dark:hover:bg-white/[0.04]'
+                ? 'border-[#71806C] dark:border-[#899783] bg-[#71806C]/15 dark:bg-[#899783]/20 text-[#242823] dark:text-[#F0EEE6] ring-1 ring-[#71806C]/30'
+                : 'border-[#D5D2C5] dark:border-[#343B35] text-[#686E64] dark:text-[#A6AA9D] bg-[#F5F3EC] dark:bg-[#151716] hover:bg-[#E2DFD6]/60 dark:hover:bg-[#272C28]/60'
             }`}
           >
-            <Moon className="w-4 h-4 text-purple-400" />
+            <Moon className="w-4 h-4 text-[#71806C] dark:text-[#899783]" />
             <span>Dark</span>
           </button>
 
@@ -181,24 +181,24 @@ export const SettingsView: React.FC = () => {
             onClick={() => setTheme('system')}
             className={`flex items-center justify-center gap-2.5 p-3 rounded-xl border text-xs font-semibold transition-all active:scale-[0.97] ${
               theme === 'system'
-                ? 'border-[#E05A47] bg-[#E05A47]/10 text-[#E05A47] shadow-cozy shadow-[#E05A47]/10 ring-2 ring-[#E05A47]/20'
-                : 'border-black/[0.06] dark:border-white/[0.08] text-[#59534E] dark:text-[#D1CBC5] bg-[#FAF8F5] dark:bg-[#141312] hover:bg-black/[0.02] dark:hover:bg-white/[0.04]'
+                ? 'border-[#71806C] dark:border-[#899783] bg-[#71806C]/15 dark:bg-[#899783]/20 text-[#242823] dark:text-[#F0EEE6] ring-1 ring-[#71806C]/30'
+                : 'border-[#D5D2C5] dark:border-[#343B35] text-[#686E64] dark:text-[#A6AA9D] bg-[#F5F3EC] dark:bg-[#151716] hover:bg-[#E2DFD6]/60 dark:hover:bg-[#272C28]/60'
             }`}
           >
-            <Laptop className="w-4 h-4 text-blue-500" />
+            <Laptop className="w-4 h-4 text-[#686E64] dark:text-[#A6AA9D]" />
             <span>System</span>
           </button>
         </div>
       </div>
 
       {/* Data Management Section */}
-      <div className="p-6 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-[#1B1918] shadow-cozy space-y-4">
+      <div className="p-6 rounded-2xl border border-[#D5D2C5] dark:border-[#343B35] bg-[#EAE8DF] dark:bg-[#202421] space-y-4">
         <div>
-          <h3 className="font-fredoka text-base text-[#292522] dark:text-[#F7F4EF] flex items-center gap-2">
-            <Database className="w-4 h-4 text-[#E05A47]" />
+          <h3 className="font-semibold text-base text-[#242823] dark:text-[#F0EEE6] flex items-center gap-2">
+            <Database className="w-4 h-4 text-[#71806C] dark:text-[#899783]" />
             <span>Local Database & Backups</span>
           </h3>
-          <p className="text-xs text-[#8C827A] dark:text-[#A8A199] mt-0.5">
+          <p className="text-xs text-[#686E64] dark:text-[#A6AA9D] mt-0.5">
             All relationship snapshots, tags, and accounts are stored strictly on your computer inside IndexedDB.
           </p>
         </div>
@@ -232,7 +232,7 @@ export const SettingsView: React.FC = () => {
           <Button
             variant="secondary"
             size="sm"
-            leftIcon={<Sparkles className="w-3.5 h-3.5 text-amber-500" />}
+            leftIcon={<Sparkles className="w-3.5 h-3.5 text-[#71806C] dark:text-[#899783]" />}
             onClick={handleSeedSample}
           >
             Load 10k Demo Dataset
@@ -240,12 +240,12 @@ export const SettingsView: React.FC = () => {
         </div>
 
         {/* Danger Zone */}
-        <div className="pt-4 border-t border-black/[0.06] dark:border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="pt-4 border-t border-[#D5D2C5] dark:border-[#343B35] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h4 className="text-xs font-bold text-rose-600 dark:text-rose-400">
+            <h4 className="text-xs font-semibold text-[#A33F31] dark:text-[#C45B4B]">
               Clear All Application Data
             </h4>
-            <p className="text-[11px] text-[#8C827A] dark:text-[#A8A199]">
+            <p className="text-[11px] text-[#686E64] dark:text-[#A6AA9D]">
               Permanently erase all stored snapshots, custom tags, and whitelists from this browser.
             </p>
           </div>

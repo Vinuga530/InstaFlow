@@ -167,26 +167,20 @@ export default defineContentScript({
           animation: instatrackSlideUp 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Light Theme (Warm Cozy Oat) */
+        /* Light Theme (Quiet Precision) */
         .instatrack-card.light {
-          background: rgba(250, 248, 245, 0.94);
-          color: #292522;
-          border: 1px solid rgba(0, 0, 0, 0.08);
-          box-shadow: 
-            0 24px 64px -12px rgba(41, 37, 34, 0.28),
-            0 12px 24px -6px rgba(41, 37, 34, 0.15),
-            0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+          background: #F5F3EC;
+          color: #242823;
+          border: 1px solid #D5D2C5;
+          box-shadow: 0 16px 40px -8px rgba(36, 40, 35, 0.12);
         }
 
-        /* Dark Theme (Warm Espresso) */
+        /* Dark Theme (Quiet Precision) */
         .instatrack-card.dark {
-          background: rgba(27, 25, 24, 0.95);
-          color: #F7F4EF;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          box-shadow: 
-            0 24px 64px -12px rgba(0, 0, 0, 0.65),
-            0 12px 24px -6px rgba(0, 0, 0, 0.35),
-            0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+          background: #151716;
+          color: #F0EEE6;
+          border: 1px solid #343B35;
+          box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.6);
         }
 
         @keyframes instatrackSlideDown {
@@ -217,10 +211,10 @@ export default defineContentScript({
           align-items: center;
           justify-content: space-between;
           padding-bottom: 12px;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+          border-bottom: 1px solid #D5D2C5;
         }
         .dark .instatrack-header {
-          border-bottom-color: rgba(255, 255, 255, 0.08);
+          border-bottom-color: #343B35;
         }
 
         .instatrack-brand {
@@ -237,7 +231,6 @@ export default defineContentScript({
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
         }
 
         .instatrack-title {
@@ -250,10 +243,10 @@ export default defineContentScript({
         .instatrack-subtitle {
           font-size: 10px;
           font-weight: 500;
-          color: #8C827A;
+          color: #686E64;
         }
         .dark .instatrack-subtitle {
-          color: #A8A199;
+          color: #A6AA9D;
         }
 
         .instatrack-header-actions {
@@ -270,22 +263,22 @@ export default defineContentScript({
           border-radius: 10px;
           font-size: 11px;
           font-weight: 600;
-          color: #8C827A;
+          color: #686E64;
           background: transparent;
           border: none;
           cursor: pointer;
           transition: all 0.15s ease;
         }
         .instatrack-btn-dash:hover {
-          color: #292522;
-          background: rgba(0, 0, 0, 0.04);
+          color: #242823;
+          background: #E2DFD6;
         }
         .dark .instatrack-btn-dash {
-          color: #A8A199;
+          color: #A6AA9D;
         }
         .dark .instatrack-btn-dash:hover {
-          color: #F7F4EF;
-          background: rgba(255, 255, 255, 0.08);
+          color: #F0EEE6;
+          background: #202421;
         }
 
         .instatrack-btn-close {
@@ -293,8 +286,8 @@ export default defineContentScript({
           height: 26px;
           border-radius: 8px;
           border: none;
-          background: rgba(0, 0, 0, 0.04);
-          color: #8C827A;
+          background: #E2DFD6;
+          color: #686E64;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -304,16 +297,16 @@ export default defineContentScript({
           transition: all 0.15s ease;
         }
         .instatrack-btn-close:hover {
-          background: rgba(224, 90, 71, 0.12);
-          color: #E05A47;
+          background: rgba(163, 63, 49, 0.12);
+          color: #A33F31;
         }
         .dark .instatrack-btn-close {
-          background: rgba(255, 255, 255, 0.08);
-          color: #A8A199;
+          background: #202421;
+          color: #A6AA9D;
         }
         .dark .instatrack-btn-close:hover {
-          background: rgba(224, 90, 71, 0.2);
-          color: #E05A47;
+          background: rgba(196, 91, 75, 0.2);
+          color: #C45B4B;
         }
 
         /* Well Card Containers */
@@ -323,14 +316,12 @@ export default defineContentScript({
           display: flex;
           flex-direction: column;
           gap: 8px;
-          border: 1px solid rgba(0, 0, 0, 0.06);
-          background: rgba(255, 255, 255, 0.85);
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+          border: 1px solid #D5D2C5;
+          background: #EAE8DF;
         }
         .dark .instatrack-well {
-          border-color: rgba(255, 255, 255, 0.08);
-          background: rgba(20, 19, 18, 0.85);
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          border-color: #343B35;
+          background: #202421;
         }
 
         .instatrack-well-header {
@@ -341,13 +332,13 @@ export default defineContentScript({
 
         .instatrack-tag {
           font-size: 10px;
-          font-weight: 700;
+          font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.5px;
-          color: #8C827A;
+          color: #686E64;
         }
         .dark .instatrack-tag {
-          color: #A8A199;
+          color: #A6AA9D;
         }
 
         .instatrack-status-pill {
@@ -357,23 +348,26 @@ export default defineContentScript({
           padding: 2px 8px;
           border-radius: 999px;
           font-size: 10px;
-          font-weight: 700;
-          background: rgba(16, 185, 129, 0.1);
-          color: #059669;
-          border: 1px solid rgba(16, 185, 129, 0.2);
+          font-weight: 600;
+          background: rgba(113, 128, 108, 0.15);
+          color: #71806C;
+          border: 1px solid rgba(113, 128, 108, 0.3);
         }
         .dark .instatrack-status-pill {
-          background: rgba(16, 185, 129, 0.15);
-          color: #34D399;
-          border-color: rgba(16, 185, 129, 0.3);
+          background: rgba(137, 151, 131, 0.2);
+          color: #899783;
+          border-color: rgba(137, 151, 131, 0.3);
         }
 
         .instatrack-dot {
           width: 6px;
           height: 6px;
           border-radius: 50%;
-          background: #10B981;
+          background: #71806C;
           animation: instatrackPulse 1.6s infinite;
+        }
+        .dark .instatrack-dot {
+          background: #899783;
         }
 
         @keyframes instatrackPulse {
@@ -392,54 +386,59 @@ export default defineContentScript({
           border-radius: 12px;
           padding: 8px;
           text-align: center;
-          background: rgba(250, 248, 245, 0.8);
-          border: 1px solid rgba(0, 0, 0, 0.04);
+          background: #F5F3EC;
+          border: 1px solid #D5D2C5;
         }
         .dark .instatrack-metric-box {
-          background: rgba(15, 14, 13, 0.8);
-          border-color: rgba(255, 255, 255, 0.04);
+          background: #151716;
+          border-color: #343B35;
         }
 
         .instatrack-metric-label {
           font-size: 10px;
           font-weight: 500;
-          color: #8C827A;
+          color: #686E64;
           margin-bottom: 2px;
         }
         .dark .instatrack-metric-label {
-          color: #A8A199;
+          color: #A6AA9D;
         }
 
         .instatrack-metric-val {
-          font-family: 'Fredoka One', cursive, sans-serif;
           font-size: 18px;
-          color: #292522;
+          font-weight: 600;
+          color: #242823;
         }
         .dark .instatrack-metric-val {
-          color: #F7F4EF;
+          color: #F0EEE6;
         }
 
         /* Action Buttons */
         .instatrack-primary-btn {
           width: 100%;
           padding: 10px 14px;
-          border-radius: 14px;
+          border-radius: 12px;
           font-size: 12px;
-          font-weight: 700;
-          color: white;
-          background: #E05A47;
+          font-weight: 600;
+          color: #F5F3EC;
+          background: #71806C;
           border: none;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 6px;
-          box-shadow: 0 4px 12px rgba(224, 90, 71, 0.28);
           transition: all 0.15s ease;
         }
         .instatrack-primary-btn:hover {
-          background: #D94E34;
-          box-shadow: 0 6px 16px rgba(224, 90, 71, 0.38);
+          background: #5d6a59;
+        }
+        .dark .instatrack-primary-btn {
+          background: #899783;
+          color: #151716;
+        }
+        .dark .instatrack-primary-btn:hover {
+          background: #71806c;
         }
         .instatrack-primary-btn:active {
           transform: scale(0.98);
@@ -451,9 +450,9 @@ export default defineContentScript({
           border-radius: 12px;
           font-size: 11px;
           font-weight: 600;
-          color: #292522;
-          background: white;
-          border: 1px solid rgba(0, 0, 0, 0.08);
+          color: #242823;
+          background: #F5F3EC;
+          border: 1px solid #D5D2C5;
           cursor: pointer;
           display: flex;
           align-items: center;
@@ -462,15 +461,15 @@ export default defineContentScript({
           transition: all 0.15s ease;
         }
         .dark .instatrack-secondary-btn {
-          color: #F7F4EF;
-          background: #1B1918;
-          border-color: rgba(255, 255, 255, 0.08);
+          color: #F0EEE6;
+          background: #151716;
+          border-color: #343B35;
         }
         .instatrack-secondary-btn:hover {
-          background: rgba(0, 0, 0, 0.02);
+          background: #EAE8DF;
         }
         .dark .instatrack-secondary-btn:hover {
-          background: rgba(255, 255, 255, 0.04);
+          background: #202421;
         }
         .instatrack-secondary-btn:active {
           transform: scale(0.98);
@@ -482,10 +481,10 @@ export default defineContentScript({
           padding: 8px 12px;
           border-radius: 12px;
           font-size: 11px;
-          font-weight: 700;
-          color: #059669;
-          background: rgba(16, 185, 129, 0.1);
-          border: 1px solid rgba(16, 185, 129, 0.25);
+          font-weight: 600;
+          color: #71806C;
+          background: rgba(113, 128, 108, 0.15);
+          border: 1px solid rgba(113, 128, 108, 0.3);
           cursor: pointer;
           display: flex;
           align-items: center;
@@ -494,38 +493,44 @@ export default defineContentScript({
           transition: all 0.15s ease;
         }
         .dark .instatrack-scan-btn {
-          color: #34D399;
-          background: rgba(16, 185, 129, 0.15);
-          border-color: rgba(16, 185, 129, 0.3);
+          color: #899783;
+          background: rgba(137, 151, 131, 0.2);
+          border-color: rgba(137, 151, 131, 0.3);
         }
         .instatrack-scan-btn:hover {
-          background: rgba(16, 185, 129, 0.18);
+          background: rgba(113, 128, 108, 0.25);
+        }
+        .dark .instatrack-scan-btn:hover {
+          background: rgba(137, 151, 131, 0.3);
         }
         .instatrack-scan-btn:disabled {
-          opacity: 0.6;
+          opacity: 0.5;
           cursor: not-allowed;
         }
 
         /* Progress indicator */
         .instatrack-progress-box {
           font-size: 11px;
-          color: #E05A47;
+          color: #71806C;
           font-weight: 600;
           text-align: center;
           padding: 4px;
         }
+        .dark .instatrack-progress-box {
+          color: #899783;
+        }
 
-        /* Footer Guarantee */
+        /* Footer */
         .instatrack-footer {
           display: flex;
           align-items: center;
           justify-content: space-between;
           font-size: 10px;
-          color: #8C827A;
+          color: #686E64;
           padding-top: 4px;
         }
         .dark .instatrack-footer {
-          color: #A8A199;
+          color: #A6AA9D;
         }
       `;
 
@@ -584,7 +589,7 @@ export default defineContentScript({
           <div style="font-size: 12px; font-weight: 600;">
             ${
               pageUser
-                ? `Browsing profile: <strong style="color: #E05A47;">@${pageUser}</strong>`
+                ? `Browsing profile: <strong style="color: #71806C;">@${pageUser}</strong>`
                 : 'Instagram tab is connected'
             }
           </div>
@@ -598,15 +603,15 @@ export default defineContentScript({
         <div class="instatrack-well">
           <div class="instatrack-well-header">
             <span class="instatrack-tag">Active Snapshot</span>
-            <span style="font-size: 10px; color: #8C827A;">${timeStr}</span>
+            <span style="font-size: 10px; color: #686E64;">${timeStr}</span>
           </div>
           <div style="display: flex; align-items: center; justify-content: space-between;">
-            <span style="font-family: 'Fredoka One', cursive, sans-serif; font-size: 14px;">
+            <span style="font-weight: 600; font-size: 13px;">
               @${activeUser}
             </span>
             ${
               notFollowingCount > 0
-                ? `<span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 999px; background: rgba(244,63,94,0.1); color: #F43F5E;">${notFollowingCount} don't follow back</span>`
+                ? `<span style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 999px; background: rgba(158, 126, 67, 0.15); color: #9E7E43; border: 1px solid rgba(158, 126, 67, 0.3);">${notFollowingCount} don't follow back</span>`
                 : ''
             }
           </div>

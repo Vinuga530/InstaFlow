@@ -29,11 +29,11 @@ export const Avatar: React.FC<AvatarProps> = ({
   return (
     <div
       className={cn(
-        'relative inline-flex items-center justify-center rounded-2xl text-white shadow-cozy shrink-0 select-none bg-gradient-to-tr font-fredoka',
+        'relative inline-flex items-center justify-center rounded-xl font-medium shrink-0 select-none shadow-subtle',
         sizeClasses[size],
         gradientClass,
         hasRing &&
-          'ring-2 ring-[#E05A47]/80 ring-offset-2 ring-offset-white dark:ring-offset-[#1B1918]',
+          'ring-1 ring-[#71806C] dark:ring-[#899783] ring-offset-2 ring-offset-[#F5F3EC] dark:ring-offset-[#151716]',
         className
       )}
     >

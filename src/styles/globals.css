@@ -27,31 +27,49 @@
 
 @layer base {
   :root {
-    --bg-canvas: #FAF8F5;
-    --bg-surface: #FFFFFF;
-    --bg-surface-subtle: #F3EFEA;
-    --bg-surface-hover: #EBE5DC;
-    --border-subtle: rgba(55, 48, 40, 0.07);
-    --border-strong: rgba(55, 48, 40, 0.14);
-    --text-primary: #292522;
-    --text-secondary: #6B655E;
-    --text-tertiary: #9B948B;
-    --accent-primary: #E1306C;
-    --accent-subtle: rgba(225, 48, 108, 0.08);
+    --bg-canvas: #F5F3EC;
+    --bg-surface: #EAE8DF;
+    --bg-surface-subtle: #E2DFD6;
+    --bg-surface-hover: #DCD9CE;
+    --border-subtle: #D5D2C5;
+    --border-strong: #BCB8A9;
+    --text-primary: #242823;
+    --text-secondary: #686E64;
+    --text-tertiary: #8D9387;
+    --accent-primary: #71806C;
+    --accent-subtle: rgba(113, 128, 108, 0.12);
+    --accent-hover: #606E5B;
+
+    /* Semantic Status (Quiet & Muted) */
+    --status-success: #71806C;
+    --status-success-bg: rgba(113, 128, 108, 0.12);
+    --status-danger: #A33F31;
+    --status-danger-bg: rgba(163, 63, 49, 0.10);
+    --status-warning: #9E7E43;
+    --status-warning-bg: rgba(158, 126, 67, 0.12);
   }
 
   .dark {
-    --bg-canvas: #121110;
-    --bg-surface: #1B1918;
-    --bg-surface-subtle: #242220;
-    --bg-surface-hover: #2C2926;
-    --border-subtle: rgba(246, 241, 235, 0.08);
-    --border-strong: rgba(246, 241, 235, 0.16);
-    --text-primary: #F7F4EF;
-    --text-secondary: #A8A29A;
-    --text-tertiary: #6E6861;
-    --accent-primary: #FF5A82;
-    --accent-subtle: rgba(255, 90, 130, 0.14);
+    --bg-canvas: #151716;
+    --bg-surface: #202421;
+    --bg-surface-subtle: #272C28;
+    --bg-surface-hover: #2E342F;
+    --border-subtle: #343B35;
+    --border-strong: #444E46;
+    --text-primary: #F0EEE6;
+    --text-secondary: #A6AA9D;
+    --text-tertiary: #72776C;
+    --accent-primary: #899783;
+    --accent-subtle: rgba(137, 151, 131, 0.15);
+    --accent-hover: #98A792;
+
+    /* Semantic Status (Quiet & Muted) */
+    --status-success: #899783;
+    --status-success-bg: rgba(137, 151, 131, 0.15);
+    --status-danger: #C45B4B;
+    --status-danger-bg: rgba(196, 91, 75, 0.15);
+    --status-warning: #C0A268;
+    --status-warning-bg: rgba(192, 162, 104, 0.15);
   }
 
   body {
@@ -71,18 +89,18 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Cozy card styling */
+/* Quiet editorial card styling */
 .surface-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: 18px;
-  box-shadow: 0 1px 3px rgba(42, 39, 35, 0.04);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
-/* Soft rounded scrollbar */
+/* Soft understated scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -90,12 +108,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(155, 148, 139, 0.25);
+  background: var(--border-subtle);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(155, 148, 139, 0.45);
+  background: var(--border-strong);
 }
 
 /* Soft, comfortable micro-interactions */

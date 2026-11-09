@@ -24,8 +24,8 @@ export const StatCard: React.FC<StatCardProps> = ({
   value,
   subtext,
   icon,
-  iconColor = 'text-brand-500',
-  iconBg = 'bg-brand-500/10',
+  iconColor = 'text-[#71806C] dark:text-[#899783]',
+  iconBg = 'bg-[#71806C]/10 dark:bg-[#899783]/15',
   changeIndicator,
   onClick,
   className,
@@ -38,16 +38,16 @@ export const StatCard: React.FC<StatCardProps> = ({
       onClick={onClick}
       className={cn(
         'group relative rounded-2xl p-4 sm:p-4.5 border transition-all duration-150 select-none',
-        'bg-white dark:bg-[#1B1918]',
-        'border-black/[0.06] dark:border-white/[0.08] shadow-subtle',
+        'bg-[#EAE8DF] dark:bg-[#202421]',
+        'border-[#D5D2C5] dark:border-[#343B35] shadow-subtle',
         isClickable &&
-          'cursor-pointer hover:border-black/[0.12] dark:hover:border-white/[0.15] hover:shadow-cozy hover:scale-[1.01] active:scale-[0.99]',
-        active && 'ring-2 ring-brand-500/30 border-brand-500/80',
+          'cursor-pointer hover:border-[#BCB8A9] dark:hover:border-[#444E46] active:scale-[0.99]',
+        active && 'ring-1 ring-[#71806C]/40 dark:ring-[#899783]/40 border-[#71806C] dark:border-[#899783]',
         className
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 truncate">
+        <p className="text-xs font-medium text-[#686E64] dark:text-[#A6AA9D] truncate">
           {title}
         </p>
         {icon && (
@@ -58,17 +58,17 @@ export const StatCard: React.FC<StatCardProps> = ({
       </div>
 
       <div className="mt-2.5 flex items-baseline justify-between gap-2">
-        <p className="text-2xl sm:text-[26px] font-fredoka font-normal tracking-tight text-neutral-900 dark:text-neutral-50 tabular-nums">
+        <p className="text-2xl sm:text-[26px] font-semibold tracking-tight text-[#242823] dark:text-[#F0EEE6] tabular-nums">
           {typeof value === 'number' ? formatNumber(value) : value}
         </p>
 
         {changeIndicator && (
           <span
             className={cn(
-              'inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold tabular-nums',
+              'inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium tabular-nums',
               changeIndicator.isPositive
-                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                ? 'bg-[#71806C]/15 text-[#5A6755] dark:text-[#A6B5A0]'
+                : 'bg-[#A33F31]/10 text-[#8A3226] dark:text-[#DC7C6E]'
             )}
           >
             {changeIndicator.isPositive ? '+' : ''}
@@ -78,7 +78,7 @@ export const StatCard: React.FC<StatCardProps> = ({
       </div>
 
       {subtext && (
-        <p className="mt-1 text-[11px] text-neutral-400 dark:text-neutral-500 truncate">
+        <p className="mt-1 text-[11px] text-[#8D9387] dark:text-[#72776C] truncate">
           {subtext}
         </p>
       )}

@@ -72,12 +72,12 @@ export const Header: React.FC = () => {
   const current = titles[activeCategory] || titles.overview;
 
   return (
-    <header className="h-16 px-6 md:px-8 flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] bg-white/70 dark:bg-[#161514]/80 backdrop-blur-xl shrink-0 select-none">
+    <header className="h-16 px-6 md:px-8 flex items-center justify-between border-b border-[#D5D2C5] dark:border-[#343B35] bg-[#EAE8DF] dark:bg-[#202421] shrink-0 select-none">
       <div>
-        <h2 className="text-base sm:text-lg font-fredoka font-normal tracking-wide text-neutral-900 dark:text-neutral-50">
+        <h2 className="text-base sm:text-lg font-medium tracking-tight text-[#242823] dark:text-[#F0EEE6]">
           {current.title}
         </h2>
-        <p className="text-[11px] text-neutral-400 hidden sm:block">
+        <p className="text-[11px] text-[#686E64] dark:text-[#A6AA9D] hidden sm:block">
           {current.subtitle}
         </p>
       </div>
@@ -90,7 +90,7 @@ export const Header: React.FC = () => {
               <select
                 value={activeSnapshot?.id || ''}
                 onChange={(e) => selectSnapshot(e.target.value)}
-                className="appearance-none pl-7 pr-7 py-1.5 text-xs font-medium rounded-xl border border-black/[0.07] dark:border-white/[0.1] bg-white dark:bg-[#242220] text-neutral-800 dark:text-neutral-200 cursor-pointer shadow-subtle focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+                className="appearance-none pl-7 pr-7 py-1.5 text-xs font-medium rounded-xl border border-[#D5D2C5] dark:border-[#343B35] bg-[#F5F3EC] dark:bg-[#151716] text-[#242823] dark:text-[#F0EEE6] cursor-pointer shadow-subtle focus:outline-none focus:ring-1 focus:ring-[#71806C]/40 dark:focus:ring-[#899783]/40"
               >
                 {snapshots.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -98,8 +98,8 @@ export const Header: React.FC = () => {
                   </option>
                 ))}
               </select>
-              <Calendar className="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <Layers className="w-3 h-3 text-neutral-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Calendar className="w-3.5 h-3.5 text-[#686E64] dark:text-[#A6AA9D] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Layers className="w-3 h-3 text-[#686E64] dark:text-[#A6AA9D] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
 
             {/* Compare snapshots button */}
@@ -107,7 +107,7 @@ export const Header: React.FC = () => {
               <Button
                 variant="secondary"
                 size="xs"
-                leftIcon={<GitCompare className="w-3.5 h-3.5 text-purple-500" />}
+                leftIcon={<GitCompare className="w-3.5 h-3.5" />}
                 onClick={() => setCompareModalOpen(true)}
               >
                 Compare
@@ -121,7 +121,7 @@ export const Header: React.FC = () => {
           <Button
             variant="secondary"
             size="xs"
-            leftIcon={<Activity className="w-3.5 h-3.5 text-rose-500" />}
+            leftIcon={<Activity className="w-3.5 h-3.5" />}
             onClick={() => setDataSourceMode('live')}
           >
             Live Hub

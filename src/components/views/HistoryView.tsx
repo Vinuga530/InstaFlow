@@ -82,7 +82,7 @@ export const HistoryView: React.FC = () => {
     return (
       <div className="p-8 max-w-4xl mx-auto">
         <EmptyState
-          icon={<History className="w-10 h-10 text-[#8C827A] dark:text-[#A8A199]" />}
+          icon={<History className="w-10 h-10 text-[#686E64] dark:text-[#A6AA9D]" />}
           title="No Snapshot History Yet"
           description="Every time you import your Instagram data export, InstaTrack records a dated snapshot so you can comfortably track follower gains, losses, and mutual connections over time."
           actionLabel="Import First Snapshot"
@@ -96,10 +96,10 @@ export const HistoryView: React.FC = () => {
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h3 className="font-fredoka text-xl text-[#292522] dark:text-[#F7F4EF]">
+          <h3 className="font-medium tracking-tight text-xl text-[#242823] dark:text-[#F0EEE6]">
             Recorded Snapshots ({snapshots.length})
           </h3>
-          <p className="text-xs text-[#8C827A] dark:text-[#A8A199] mt-0.5">
+          <p className="text-xs text-[#686E64] dark:text-[#A6AA9D] mt-0.5">
             Switch between snapshots to review historical data, or compare any two points in time.
           </p>
         </div>
@@ -127,42 +127,42 @@ export const HistoryView: React.FC = () => {
               key={snap.id}
               className={`p-5 rounded-2xl border transition-all ${
                 isActive
-                  ? 'border-[#E05A47] bg-[#E05A47]/[0.03] dark:bg-[#E05A47]/[0.06] shadow-cozy ring-2 ring-[#E05A47]/20'
-                  : 'border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-[#1B1918] shadow-cozy hover:border-black/[0.12] dark:hover:border-white/[0.16]'
+                  ? 'border-[#71806C] dark:border-[#899783] bg-[#71806C]/[0.06] dark:bg-[#899783]/[0.08] ring-1 ring-[#71806C]/30'
+                  : 'border-[#D5D2C5] dark:border-[#343B35] bg-[#EAE8DF] dark:bg-[#202421] hover:border-[#71806C]/40 dark:hover:border-[#899783]/40'
               }`}
             >
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 {/* Left: Info */}
                 <div className="space-y-1.5 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h4 className="font-fredoka text-base text-[#292522] dark:text-[#F7F4EF]">
+                    <h4 className="font-semibold text-base text-[#242823] dark:text-[#F0EEE6]">
                       {snap.label}
                     </h4>
                     {isLatest && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#71806C]/15 dark:bg-[#899783]/20 text-[#71806C] dark:text-[#899783] border border-[#71806C]/30">
                         Latest
                       </span>
                     )}
                     {isActive && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E05A47] text-white shadow-cozy shadow-[#E05A47]/20">
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#71806C] dark:bg-[#899783] text-[#F5F3EC] dark:text-[#151716]">
                         Active
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-[#8C827A] dark:text-[#A8A199] flex-wrap">
+                  <div className="flex items-center gap-3 text-xs text-[#686E64] dark:text-[#A6AA9D] flex-wrap">
                     <span className="flex items-center gap-1 font-medium">
-                      <Calendar className="w-3.5 h-3.5 text-[#8C827A] dark:text-[#A8A199]" />
+                      <Calendar className="w-3.5 h-3.5 text-[#686E64] dark:text-[#A6AA9D]" />
                       {formatDateTime(snap.timestamp)}
                     </span>
-                    <span className="font-semibold text-[#59534E] dark:text-[#D1CBC5]">
+                    <span className="font-medium text-[#242823] dark:text-[#F0EEE6]">
                       @{snap.accountUsername || 'unknown'}
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-black/[0.04] dark:bg-white/[0.06] text-[10px] font-bold uppercase tracking-wider text-[#59534E] dark:text-[#D1CBC5]">
+                    <span className="px-2 py-0.5 rounded-full bg-[#F5F3EC] dark:bg-[#151716] border border-[#D5D2C5] dark:border-[#343B35] text-[10px] font-medium uppercase tracking-wider text-[#686E64] dark:text-[#A6AA9D]">
                       {snap.sourceType}
                     </span>
                   </div>
                   {snap.notes && (
-                    <p className="text-xs text-[#8C827A] dark:text-[#A8A199] italic pt-0.5">
+                    <p className="text-xs text-[#686E64] dark:text-[#A6AA9D] italic pt-0.5">
                       "{snap.notes}"
                     </p>
                   )}
@@ -170,31 +170,31 @@ export const HistoryView: React.FC = () => {
 
                 {/* Center: Stat Badges */}
                 <div className="flex flex-wrap items-center gap-2 text-xs">
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF8F5] dark:bg-[#141312] border border-black/[0.04] dark:border-white/[0.04]">
-                    <Users className="w-3.5 h-3.5 text-[#E05A47]" />
-                    <span className="font-fredoka text-sm text-[#292522] dark:text-[#F7F4EF]">
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F5F3EC] dark:bg-[#151716] border border-[#D5D2C5] dark:border-[#343B35]">
+                    <Users className="w-3.5 h-3.5 text-[#71806C] dark:text-[#899783]" />
+                    <span className="font-semibold text-sm text-[#242823] dark:text-[#F0EEE6] tabular-nums">
                       {formatNumber(snap.followerCount)}
                     </span>
-                    <span className="text-[#8C827A] dark:text-[#A8A199] font-medium">followers</span>
+                    <span className="text-[#686E64] dark:text-[#A6AA9D] font-medium">followers</span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF8F5] dark:bg-[#141312] border border-black/[0.04] dark:border-white/[0.04]">
-                    <UserCheck className="w-3.5 h-3.5 text-purple-500" />
-                    <span className="font-fredoka text-sm text-[#292522] dark:text-[#F7F4EF]">
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F5F3EC] dark:bg-[#151716] border border-[#D5D2C5] dark:border-[#343B35]">
+                    <UserCheck className="w-3.5 h-3.5 text-[#686E64] dark:text-[#A6AA9D]" />
+                    <span className="font-semibold text-sm text-[#242823] dark:text-[#F0EEE6] tabular-nums">
                       {formatNumber(snap.followingCount)}
                     </span>
-                    <span className="text-[#8C827A] dark:text-[#A8A199] font-medium">following</span>
+                    <span className="text-[#686E64] dark:text-[#A6AA9D] font-medium">following</span>
                   </div>
 
                   {snap.unfollowerCount > 0 && (
-                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold text-xs border border-rose-500/10">
+                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#A33F31]/10 text-[#A33F31] dark:text-[#C45B4B] font-semibold text-xs border border-[#A33F31]/20">
                       <UserMinus className="w-3.5 h-3.5" />
                       <span>-{snap.unfollowerCount} lost</span>
                     </div>
                   )}
 
                   {snap.newFollowerCount > 0 && (
-                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs border border-emerald-500/10">
+                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#71806C]/10 text-[#71806C] dark:text-[#899783] font-semibold text-xs border border-[#71806C]/20">
                       <UserPlus className="w-3.5 h-3.5" />
                       <span>+{snap.newFollowerCount} gained</span>
                     </div>

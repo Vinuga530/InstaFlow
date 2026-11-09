@@ -22,18 +22,18 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center p-8 md:p-12 text-center rounded-3xl border border-dashed',
-        'border-black/[0.08] dark:border-white/[0.08] bg-[#FAF8F5]/80 dark:bg-[#141312]/80 backdrop-blur-sm shadow-cozy',
+        'flex flex-col items-center justify-center p-8 md:p-12 text-center rounded-2xl border border-dashed',
+        'border-[#D5D2C5] dark:border-[#343B35] bg-[#EAE8DF]/50 dark:bg-[#202421]/50 shadow-subtle',
         className
       )}
     >
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white dark:bg-[#1B1918] border border-black/[0.06] dark:border-white/[0.08] text-[#8C827A] dark:text-[#A8A199] mb-4 shadow-cozy">
+      <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#EAE8DF] dark:bg-[#202421] border border-[#D5D2C5] dark:border-[#343B35] text-[#686E64] dark:text-[#A6AA9D] mb-4 shadow-subtle">
         {icon}
       </div>
-      <h3 className="font-fredoka text-lg text-[#292522] dark:text-[#F7F4EF]">
+      <h3 className="font-medium text-base text-[#242823] dark:text-[#F0EEE6]">
         {title}
       </h3>
-      <p className="mt-1.5 text-xs text-[#8C827A] dark:text-[#A8A199] max-w-sm leading-relaxed">
+      <p className="mt-1.5 text-xs text-[#686E64] dark:text-[#A6AA9D] max-w-sm leading-relaxed">
         {description}
       </p>
       {actionLabel && onAction && (

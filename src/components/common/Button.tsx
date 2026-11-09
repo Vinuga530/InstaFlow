@@ -22,7 +22,7 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-150 select-none active:scale-[0.97] disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40';
+    'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-150 select-none active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#71806C]/30 dark:focus-visible:ring-[#899783]/30';
 
   const sizeStyles = {
     xs: 'text-[11px] px-3 py-1 gap-1.5 min-h-[30px]',
@@ -33,15 +33,15 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantStyles = {
     primary:
-      'bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white shadow-cozy hover:shadow-elevated',
+      'bg-[#71806C] hover:bg-[#606E5B] dark:bg-[#899783] dark:hover:bg-[#98A792] text-[#F5F3EC] dark:text-[#151716] shadow-subtle font-medium',
     gradient:
-      'bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white shadow-cozy hover:shadow-elevated',
+      'bg-[#71806C] hover:bg-[#606E5B] dark:bg-[#899783] dark:hover:bg-[#98A792] text-[#F5F3EC] dark:text-[#151716] shadow-subtle font-medium',
     secondary:
-      'bg-white dark:bg-[#242220] hover:bg-neutral-50 dark:hover:bg-[#2C2926] text-neutral-800 dark:text-neutral-100 border border-black/[0.07] dark:border-white/[0.09] shadow-subtle',
+      'bg-[#EAE8DF] dark:bg-[#202421] hover:bg-[#E2DFD6] dark:hover:bg-[#272C28] text-[#242823] dark:text-[#F0EEE6] border border-[#D5D2C5] dark:border-[#343B35] shadow-subtle',
     ghost:
-      'hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white',
+      'hover:bg-[#E2DFD6]/60 dark:hover:bg-[#272C28]/60 text-[#686E64] dark:text-[#A6AA9D] hover:text-[#242823] dark:hover:text-[#F0EEE6]',
     danger:
-      'bg-rose-500/10 hover:bg-rose-500/15 active:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20',
+      'bg-[#A33F31]/10 hover:bg-[#A33F31]/15 active:bg-[#A33F31]/20 text-[#A33F31] dark:text-[#C45B4B] dark:bg-[#C45B4B]/15 border border-[#A33F31]/20 dark:border-[#C45B4B]/25',
   };
 
   return (

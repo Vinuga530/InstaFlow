@@ -81,7 +81,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#FAF8F5] dark:bg-[#121110] text-[#292522] dark:text-[#F7F4EF] font-sans selection:bg-[#E05A47]/20 selection:text-[#E05A47]">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#F5F3EC] dark:bg-[#151716] text-[#242823] dark:text-[#F0EEE6] font-sans selection:bg-[#71806C]/20 dark:selection:bg-[#899783]/25 selection:text-[#242823] dark:selection:text-[#F0EEE6]">
       {/* Navigation Sidebar */}
       <Sidebar />
 
@@ -105,9 +105,9 @@ export const App: React.FC = () => {
       {/* Full-screen Loading Overlay */}
       {isLoading && (
         <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="flex flex-col items-center gap-3 p-6 rounded-3xl bg-white/95 dark:bg-[#1B1918]/95 border border-black/[0.06] dark:border-white/[0.08] shadow-cozy-lg">
-            <Loader2 className="w-8 h-8 text-[#E05A47] animate-spin" />
-            <span className="font-fredoka text-sm text-[#292522] dark:text-[#F7F4EF]">
+          <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-[#EAE8DF]/95 dark:bg-[#202421]/95 border border-[#D5D2C5] dark:border-[#343B35] shadow-elevated">
+            <Loader2 className="w-7 h-7 text-[#71806C] dark:text-[#899783] animate-spin" />
+            <span className="text-sm font-medium text-[#242823] dark:text-[#F0EEE6]">
               {loadingMessage || 'Processing...'}
             </span>
           </div>
