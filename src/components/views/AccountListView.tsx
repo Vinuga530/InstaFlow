@@ -66,22 +66,22 @@ const AccountRow = React.memo<AccountRowProps>(
 
     return (
       <tr
-        className={`group transition-colors border-b border-[#D5D2C5]/60 dark:border-[#343B35]/60 ${
+        className={`group transition-colors border-b border-[var(--border-subtle)] ${
           isSelected
-            ? 'bg-[#71806C]/10 dark:bg-[#899783]/15'
-            : 'hover:bg-[#E2DFD6]/40 dark:hover:bg-[#272C28]/40'
+            ? 'bg-[var(--accent-subtle)]'
+            : 'hover:bg-[var(--bg-surface-hover)]'
         }`}
       >
         {/* Selection Checkbox */}
         <td className="py-2.5 px-3.5 text-center w-10">
           <button
             onClick={() => onToggleSelect(account.username)}
-            className="p-1 rounded-md text-[#686E64] dark:text-[#A6AA9D] hover:text-[#242823] dark:hover:text-[#F0EEE6] transition-colors"
+            className="p-1 rounded-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
             {isSelected ? (
-              <CheckSquare className="w-4 h-4 text-[#71806C] dark:text-[#899783]" />
+              <CheckSquare className="w-4 h-4 text-[var(--accent-primary)]" />
             ) : (
-              <Square className="w-4 h-4 text-[#686E64]/40 dark:text-[#A6AA9D]/40" />
+              <Square className="w-4 h-4 text-[var(--border-strong)]" />
             )}
           </button>
         </td>
@@ -92,26 +92,26 @@ const AccountRow = React.memo<AccountRowProps>(
             <Avatar username={account.username} size="sm" />
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="font-semibold text-xs text-[#242823] dark:text-[#F0EEE6] truncate">
+                <span className="font-bold text-xs text-[var(--text-primary)] truncate">
                   @{account.username}
                 </span>
                 <a
                   href={account.profileUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-[#686E64] dark:text-[#A6AA9D] hover:text-[#71806C] dark:hover:text-[#899783] p-0.5 rounded transition-colors"
+                  className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] p-0.5 rounded transition-colors"
                   title="Open Instagram Profile"
                 >
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
               {account.fullName && (
-                <p className="text-[11px] text-[#686E64] dark:text-[#A6AA9D] truncate">
+                <p className="text-[11px] text-[var(--text-secondary)] truncate">
                   {account.fullName}
                 </p>
               )}
               {notes && (
-                <p className="text-[11px] text-[#9E7E43] dark:text-[#CBB279] mt-0.5 flex items-center gap-1 truncate font-medium">
+                <p className="text-[11px] text-[var(--status-warning)] mt-0.5 flex items-center gap-1 truncate font-medium">
                   <FileText className="w-3 h-3 shrink-0" />
                   <span>{notes}</span>
                 </p>
@@ -129,7 +129,7 @@ const AccountRow = React.memo<AccountRowProps>(
         </td>
 
         {/* Follow Date */}
-        <td className="py-2.5 px-3.5 hidden md:table-cell text-xs text-[#686E64] dark:text-[#A6AA9D] tabular-nums">
+        <td className="py-2.5 px-3.5 hidden md:table-cell text-xs text-[var(--text-secondary)] tabular-nums">
           {account.timestamp ? formatDate(account.timestamp) : '—'}
         </td>
 
@@ -140,7 +140,7 @@ const AccountRow = React.memo<AccountRowProps>(
               <button
                 onClick={() => onUnfollow(account.username)}
                 disabled={isUnfollowing}
-                className="px-2 py-1 rounded-lg text-[11px] font-semibold text-[#A33F31] dark:text-[#C45B4B] bg-[#A33F31]/10 hover:bg-[#A33F31]/15 border border-[#A33F31]/20 dark:border-[#C45B4B]/25 transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
+                className="px-2 py-1 rounded-lg text-[11px] font-semibold text-[var(--status-negative)] bg-[var(--status-negative-bg)] hover:opacity-90 border border-[var(--status-negative)]/25 transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
                 title="Unfollow on Instagram"
               >
                 {isUnfollowing ? (
@@ -158,19 +158,19 @@ const AccountRow = React.memo<AccountRowProps>(
               onClick={() => onToggleWhitelist(account.username)}
               className={`p-1.5 rounded-lg transition-colors ${
                 isWhitelisted
-                  ? 'text-[#9E7E43] dark:text-[#CBB279]'
-                  : 'text-[#686E64]/40 dark:text-[#A6AA9D]/40 hover:text-[#9E7E43] dark:hover:text-[#CBB279] hover:bg-[#E2DFD6]/60 dark:hover:bg-[#272C28]/60'
+                  ? 'text-[var(--status-warning)]'
+                  : 'text-[var(--text-tertiary)] hover:text-[var(--status-warning)] hover:bg-[var(--bg-surface-subtle)]'
               }`}
               title={isWhitelisted ? 'Remove from whitelist' : 'Star to whitelist'}
             >
               <Star
-                className={`w-3.5 h-3.5 ${isWhitelisted ? 'fill-[#9E7E43] dark:fill-[#CBB279]' : ''}`}
+                className={`w-3.5 h-3.5 ${isWhitelisted ? 'fill-[var(--status-warning)]' : ''}`}
               />
             </button>
 
             <button
               onClick={() => onOpenNotes(account)}
-              className="p-1.5 rounded-lg text-[#686E64] dark:text-[#A6AA9D] hover:text-[#242823] dark:hover:text-[#F0EEE6] hover:bg-[#E2DFD6]/60 dark:hover:bg-[#272C28]/60 transition-colors"
+              className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-subtle)] transition-colors"
               title="Add notes"
             >
               <FileText className="w-3.5 h-3.5" />
@@ -267,40 +267,45 @@ export const AccountListView: React.FC = () => {
     newFollowers,
   ]);
 
-  // 2. Filter data with debounced query
-  const filteredData = useMemo(() => {
+  // 2. Filter data
+  const filteredData: AccountItem[] = useMemo(() => {
     let result = rawData;
 
+    // Search query
     if (debouncedSearch.trim()) {
       const q = debouncedSearch.toLowerCase().trim();
       result = result.filter(
-        (acc) =>
-          acc.username.toLowerCase().includes(q) ||
-          (acc.fullName && acc.fullName.toLowerCase().includes(q))
+        (a) =>
+          a.username.toLowerCase().includes(q) ||
+          (a.fullName && a.fullName.toLowerCase().includes(q))
       );
     }
 
+    // Whitelist only filter
     if (whitelistedOnly) {
-      result = result.filter((acc) => {
-        const meta = accountMetadataMap.get(acc.username.toLowerCase());
-        return meta ? meta.isWhitelisted : acc.isWhitelisted;
+      result = result.filter((a) => {
+        const meta = accountMetadataMap.get(a.username.toLowerCase());
+        return meta ? meta.isWhitelisted : a.isWhitelisted;
       });
     }
 
     // 3. Sort data
     return [...result].sort((a, b) => {
-      let comparison = 0;
       if (sortField === 'username') {
-        comparison = a.username.localeCompare(b.username);
+        const cmp = a.username.localeCompare(b.username);
+        return sortOrder === 'asc' ? cmp : -cmp;
       } else if (sortField === 'timestamp') {
-        comparison = (a.timestamp || 0) - (b.timestamp || 0);
+        const timeA = a.timestamp || 0;
+        const timeB = b.timestamp || 0;
+        return sortOrder === 'asc' ? timeA - timeB : timeB - timeA;
       }
-      return sortOrder === 'asc' ? comparison : -comparison;
+      return 0;
     });
   }, [rawData, debouncedSearch, whitelistedOnly, sortField, sortOrder, accountMetadataMap]);
 
-  // 3. Windowed Pagination for 10,000+ records
-  const totalPages = Math.max(1, Math.ceil(filteredData.length / pageSize));
+  // 4. Pagination
+  const totalCount = filteredData.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const currentPage = Math.min(page, totalPages);
 
   const paginatedData = useMemo(() => {
@@ -308,20 +313,19 @@ export const AccountListView: React.FC = () => {
     return filteredData.slice(start, start + pageSize);
   }, [filteredData, currentPage, pageSize]);
 
+  // Selection states
   const selectedSet = useMemo(() => new Set(selectedUsernames), [selectedUsernames]);
-
+  const visibleUsernames = useMemo(() => paginatedData.map((a) => a.username), [paginatedData]);
   const allVisibleSelected =
-    paginatedData.length > 0 &&
-    paginatedData.every((acc) => selectedSet.has(acc.username));
+    visibleUsernames.length > 0 && visibleUsernames.every((u) => selectedSet.has(u));
 
-  const handleToggleSelectAllVisible = useCallback(() => {
+  const handleToggleSelectAllVisible = () => {
     if (allVisibleSelected) {
       clearSelection();
     } else {
-      const allUsers = paginatedData.map((a) => a.username);
-      selectAllUsernames(Array.from(new Set([...selectedUsernames, ...allUsers])));
+      selectAllUsernames(visibleUsernames);
     }
-  }, [allVisibleSelected, paginatedData, selectedUsernames, clearSelection, selectAllUsernames]);
+  };
 
   const handleCopyUsernames = useCallback(() => {
     const toCopy =
@@ -333,7 +337,7 @@ export const AccountListView: React.FC = () => {
     addToast({
       type: 'success',
       title: 'Copied to Clipboard',
-      message: `Copied ${toCopy.length} username${toCopy.length > 1 ? 's' : ''}.`,
+      message: `Copied ${toCopy.length} usernames.`,
     });
   }, [selectedUsernames, filteredData, addToast]);
 
@@ -369,7 +373,7 @@ export const AccountListView: React.FC = () => {
     return (
       <div className="p-8 max-w-3xl mx-auto space-y-4">
         <EmptyState
-          icon={<Smile className="w-8 h-8 text-neutral-400" />}
+          icon={<Smile className="w-8 h-8 text-[var(--accent-primary)]" />}
           title={`No Accounts in ${activeCategory.replace(/_/g, ' ')}`}
           description={
             activeCategory === 'unfollowers'
@@ -384,12 +388,12 @@ export const AccountListView: React.FC = () => {
   }
 
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-4">
+    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-4 animate-in fade-in duration-200">
       {/* Search, Filter & Bulk Controls Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl border border-[#D5D2C5] dark:border-[#343B35] bg-[#EAE8DF] dark:bg-[#202421]">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
         {/* Instant Search input */}
         <div className="relative flex-1 max-w-md">
-          <Search className="w-3.5 h-3.5 text-[#686E64] dark:text-[#A6AA9D] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-3.5 h-3.5 text-[var(--text-secondary)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchInput}
@@ -398,7 +402,7 @@ export const AccountListView: React.FC = () => {
               setPage(1);
             }}
             placeholder="Search by username or name..."
-            className="w-full pl-8 pr-7 py-1.5 text-xs rounded-xl border border-[#D5D2C5] dark:border-[#343B35] bg-[#F5F3EC] dark:bg-[#151716] text-[#242823] dark:text-[#F0EEE6] placeholder-[#686E64]/60 dark:placeholder-[#A6AA9D]/60 focus:outline-none focus:ring-1 focus:ring-[#71806C] dark:focus:ring-[#899783]"
+            className="w-full pl-8 pr-7 py-1.5 text-xs rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-canvas)] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
           />
           {searchInput && (
             <button
@@ -406,7 +410,7 @@ export const AccountListView: React.FC = () => {
                 setSearchInput('');
                 setPage(1);
               }}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#686E64] hover:text-[#242823] dark:hover:text-[#F0EEE6]"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             >
               <X className="w-3 h-3" />
             </button>
@@ -421,20 +425,20 @@ export const AccountListView: React.FC = () => {
               setWhitelistedOnly(!whitelistedOnly);
               setPage(1);
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
               whitelistedOnly
-                ? 'bg-[#9E7E43]/15 border-[#9E7E43]/30 text-[#9E7E43] dark:text-[#CBB279]'
-                : 'bg-[#F5F3EC] dark:bg-[#151716] border-[#D5D2C5] dark:border-[#343B35] text-[#686E64] dark:text-[#A6AA9D] hover:bg-[#E2DFD6]/60 dark:hover:bg-[#272C28]/60'
+                ? 'bg-[var(--status-warning-bg)] border-[var(--status-warning)]/30 text-[var(--status-warning)]'
+                : 'bg-[var(--bg-canvas)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-subtle)]'
             }`}
           >
             <Star
-              className={`w-3.5 h-3.5 ${whitelistedOnly ? 'fill-[#9E7E43] dark:fill-[#CBB279] text-[#9E7E43] dark:text-[#CBB279]' : 'text-[#686E64] dark:text-[#A6AA9D]'}`}
+              className={`w-3.5 h-3.5 ${whitelistedOnly ? 'fill-[var(--status-warning)] text-[var(--status-warning)]' : 'text-[var(--text-secondary)]'}`}
             />
             <span>Starred</span>
           </button>
 
           {/* Sort Control */}
-          <div className="flex items-center rounded-xl border border-[#D5D2C5] dark:border-[#343B35] bg-[#F5F3EC] dark:bg-[#151716] p-0.5 text-xs">
+          <div className="flex items-center rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-canvas)] p-0.5 text-xs">
             <button
               onClick={() => {
                 if (sortField === 'username') {
@@ -444,15 +448,15 @@ export const AccountListView: React.FC = () => {
                   setSortOrder('asc');
                 }
               }}
-              className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+              className={`px-2.5 py-1 rounded-lg font-semibold transition-all ${
                 sortField === 'username'
-                  ? 'bg-[#EAE8DF] dark:bg-[#202421] text-[#242823] dark:text-[#F0EEE6] font-semibold border border-[#D5D2C5]/80 dark:border-[#343B35]'
-                  : 'text-[#686E64] dark:text-[#A6AA9D] hover:text-[#242823] dark:hover:text-[#F0EEE6]'
+                  ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] border border-[var(--border-subtle)]'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <span>A-Z</span>
               {sortField === 'username' && (
-                <span className="ml-1 text-[10px] text-[#71806C] dark:text-[#899783]">
+                <span className="ml-1 text-[10px] text-[var(--accent-primary)]">
                   {sortOrder === 'asc' ? '↑' : '↓'}
                 </span>
               )}
@@ -466,15 +470,15 @@ export const AccountListView: React.FC = () => {
                   setSortOrder('desc');
                 }
               }}
-              className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+              className={`px-2.5 py-1 rounded-lg font-semibold transition-all ${
                 sortField === 'timestamp'
-                  ? 'bg-[#EAE8DF] dark:bg-[#202421] text-[#242823] dark:text-[#F0EEE6] font-semibold border border-[#D5D2C5]/80 dark:border-[#343B35]'
-                  : 'text-[#686E64] dark:text-[#A6AA9D] hover:text-[#242823] dark:hover:text-[#F0EEE6]'
+                  ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] border border-[var(--border-subtle)]'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <span>Date</span>
               {sortField === 'timestamp' && (
-                <span className="ml-1 text-[10px] text-[#71806C] dark:text-[#899783]">
+                <span className="ml-1 text-[10px] text-[var(--accent-primary)]">
                   {sortOrder === 'asc' ? '↑' : '↓'}
                 </span>
               )}
@@ -507,19 +511,19 @@ export const AccountListView: React.FC = () => {
       </div>
 
       {/* Account Table */}
-      <div className="overflow-hidden rounded-2xl border border-[#D5D2C5] dark:border-[#343B35] bg-[#EAE8DF] dark:bg-[#202421]">
+      <div className="overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-[#D5D2C5] dark:border-[#343B35] bg-[#E2DFD6]/60 dark:bg-[#1A1D1B] text-[11px] font-semibold text-[#686E64] dark:text-[#A6AA9D] uppercase tracking-wider">
+            <tr className="border-b border-[var(--border-subtle)] bg-[var(--bg-surface-subtle)] text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">
               <th className="py-2.5 px-3.5 w-10 text-center">
                 <button
                   onClick={handleToggleSelectAllVisible}
-                  className="p-1 text-[#686E64] dark:text-[#A6AA9D] hover:text-[#242823] dark:hover:text-[#F0EEE6]"
+                  className="p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                 >
                   {allVisibleSelected ? (
-                    <CheckSquare className="w-4 h-4 text-[#71806C] dark:text-[#899783]" />
+                    <CheckSquare className="w-4 h-4 text-[var(--accent-primary)]" />
                   ) : (
-                    <Square className="w-4 h-4 text-[#686E64]/40 dark:text-[#A6AA9D]/40" />
+                    <Square className="w-4 h-4 text-[var(--border-strong)]" />
                   )}
                 </button>
               </th>
@@ -529,7 +533,7 @@ export const AccountListView: React.FC = () => {
               <th className="py-2.5 px-3.5 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#D5D2C5]/50 dark:divide-[#343B35]/50 text-xs">
+          <tbody className="divide-y divide-[var(--border-subtle)] text-xs">
             {paginatedData.map((account) => {
               const meta = accountMetadataMap.get(account.username.toLowerCase());
               const isWhitelisted = meta ? meta.isWhitelisted : !!account.isWhitelisted;
@@ -554,20 +558,15 @@ export const AccountListView: React.FC = () => {
         </table>
 
         {/* Pagination Footer */}
-        <div className="flex items-center justify-between px-4 py-3 border-t border-[#D5D2C5] dark:border-[#343B35] bg-[#E2DFD6]/40 dark:bg-[#1A1D1B]/50 text-xs text-[#686E64] dark:text-[#A6AA9D]">
+        <div className="flex items-center justify-between px-4 py-3 border-t border-[var(--border-subtle)] bg-[var(--bg-surface-subtle)] text-xs text-[var(--text-secondary)]">
           <div className="flex items-center gap-2">
             <span>
-              Showing {(currentPage - 1) * pageSize + 1}–
-              {Math.min(currentPage * pageSize, filteredData.length)} of{' '}
-              <strong className="text-[#242823] dark:text-[#F0EEE6] tabular-nums font-semibold">
-                {filteredData.length.toLocaleString()}
-              </strong>{' '}
-              accounts
+              Showing {totalCount > 0 ? (currentPage - 1) * pageSize + 1 : 0}–
+              {Math.min(currentPage * pageSize, totalCount)} of {totalCount.toLocaleString()} accounts
             </span>
-
             {selectedUsernames.length > 0 && (
-              <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#71806C]/15 dark:bg-[#899783]/20 text-[#71806C] dark:text-[#899783] border border-[#71806C]/30 font-semibold ml-2">
-                {selectedUsernames.length} selected
+              <span className="font-semibold text-[var(--accent-primary)]">
+                &bull; {selectedUsernames.length} selected
               </span>
             )}
           </div>
@@ -579,27 +578,27 @@ export const AccountListView: React.FC = () => {
                 setPageSize(Number(e.target.value));
                 setPage(1);
               }}
-              className="px-2.5 py-1 text-xs rounded-lg border border-[#D5D2C5] dark:border-[#343B35] bg-[#F5F3EC] dark:bg-[#151716] text-[#242823] dark:text-[#F0EEE6] focus:outline-none"
+              className="py-1 px-2 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-canvas)] text-xs font-semibold text-[var(--text-primary)]"
             >
+              <option value={25}>25 / page</option>
               <option value={50}>50 / page</option>
               <option value={100}>100 / page</option>
-              <option value={250}>250 / page</option>
             </select>
 
             <button
-              disabled={currentPage <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="p-1 rounded-lg border border-[#D5D2C5] dark:border-[#343B35] text-[#686E64] dark:text-[#A6AA9D] disabled:opacity-40 hover:bg-[#E2DFD6]/60 dark:hover:bg-[#272C28]/60"
+              disabled={currentPage <= 1}
+              className="p-1 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-canvas)] text-[var(--text-primary)] disabled:opacity-30 disabled:pointer-events-none hover:bg-[var(--bg-surface-hover)]"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="tabular-nums px-1.5 font-medium">
+            <span className="font-semibold text-[var(--text-primary)] px-1">
               {currentPage} / {totalPages}
             </span>
             <button
-              disabled={currentPage >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              className="p-1 rounded-lg border border-[#D5D2C5] dark:border-[#343B35] text-[#686E64] dark:text-[#A6AA9D] disabled:opacity-40 hover:bg-[#E2DFD6]/60 dark:hover:bg-[#272C28]/60"
+              disabled={currentPage >= totalPages}
+              className="p-1 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-canvas)] text-[var(--text-primary)] disabled:opacity-30 disabled:pointer-events-none hover:bg-[var(--bg-surface-hover)]"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

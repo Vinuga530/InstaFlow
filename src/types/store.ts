@@ -1,6 +1,7 @@
 import { Snapshot, AccountMetadata } from './database';
 import { AccountItem, RelationshipCategory, SortField, SortOrder, DataSourceMode } from './analytics';
 import { LiveConnectionStatus, LiveSyncOptions, LiveSyncResult, DiagnosticCheck } from '../services/live/liveTypes';
+import { ThemeId } from './theme';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -16,6 +17,18 @@ export interface AppState {
   // Theme & Appearance
   theme: ThemeMode;
   setTheme: (theme: ThemeMode) => void;
+  activeThemeId: ThemeId;
+  setThemeId: (themeId: ThemeId) => void;
+
+  // Onboarding System
+  isOnboardingCompleted: boolean;
+  onboardingStep: number;
+  customUsername: string;
+  setOnboardingStep: (step: number) => void;
+  setCustomUsername: (username: string) => void;
+  completeOnboarding: () => Promise<void>;
+  resetOnboarding: () => Promise<void>;
+  initOnboardingState: () => Promise<void>;
 
   // Data Source Modes: Import Mode vs Live Mode
   dataSourceMode: DataSourceMode;

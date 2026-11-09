@@ -18,7 +18,6 @@ export const Header: React.FC = () => {
     selectSnapshot,
     setImportModalOpen,
     setCompareModalOpen,
-    dataSourceMode,
     setDataSourceMode,
   } = useAppStore();
 
@@ -64,20 +63,20 @@ export const Header: React.FC = () => {
       subtitle: 'Manage and compare dated imports to analyze relationship changes over time.',
     },
     settings: {
-      title: 'Settings & Privacy',
-      subtitle: 'Manage appearance, local data backups, and whitelist preferences.',
+      title: 'Preferences & Storage',
+      subtitle: 'Manage theme appearance, account handle, and local database backups.',
     },
   };
 
   const current = titles[activeCategory] || titles.overview;
 
   return (
-    <header className="h-16 px-6 md:px-8 flex items-center justify-between border-b border-[#D5D2C5] dark:border-[#343B35] bg-[#EAE8DF] dark:bg-[#202421] shrink-0 select-none">
+    <header className="h-16 px-6 md:px-8 flex items-center justify-between border-b border-[var(--border-subtle)] bg-[var(--bg-surface)] shrink-0 select-none">
       <div>
-        <h2 className="text-base sm:text-lg font-medium tracking-tight text-[#242823] dark:text-[#F0EEE6]">
+        <h2 className="text-base sm:text-lg font-bold tracking-tight text-[var(--text-primary)]">
           {current.title}
         </h2>
-        <p className="text-[11px] text-[#686E64] dark:text-[#A6AA9D] hidden sm:block">
+        <p className="text-[11px] text-[var(--text-secondary)] hidden sm:block">
           {current.subtitle}
         </p>
       </div>
@@ -90,7 +89,7 @@ export const Header: React.FC = () => {
               <select
                 value={activeSnapshot?.id || ''}
                 onChange={(e) => selectSnapshot(e.target.value)}
-                className="appearance-none pl-7 pr-7 py-1.5 text-xs font-medium rounded-xl border border-[#D5D2C5] dark:border-[#343B35] bg-[#F5F3EC] dark:bg-[#151716] text-[#242823] dark:text-[#F0EEE6] cursor-pointer shadow-subtle focus:outline-none focus:ring-1 focus:ring-[#71806C]/40 dark:focus:ring-[#899783]/40"
+                className="appearance-none pl-7 pr-7 py-1.5 text-xs font-semibold rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-canvas)] text-[var(--text-primary)] cursor-pointer shadow-subtle focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
               >
                 {snapshots.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -98,8 +97,8 @@ export const Header: React.FC = () => {
                   </option>
                 ))}
               </select>
-              <Calendar className="w-3.5 h-3.5 text-[#686E64] dark:text-[#A6AA9D] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <Layers className="w-3 h-3 text-[#686E64] dark:text-[#A6AA9D] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Calendar className="w-3.5 h-3.5 text-[var(--text-secondary)] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Layers className="w-3 h-3 text-[var(--text-secondary)] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
 
             {/* Compare snapshots button */}

@@ -1,5 +1,15 @@
 import { create } from 'zustand';
 import { AppState, ThemeMode, ToastMessage } from '../types/store';
+import { ThemeId } from '../types/theme';
+import { DEFAULT_THEME_ID, applyThemeToDocument, THEMES } from '../styles/themes';
+import {
+  getOnboardingState,
+  persistThemeId,
+  persistOnboardingStep,
+  persistUsername,
+  markOnboardingCompleted,
+  resetOnboardingFlow,
+} from '../services/storage/onboardingService';
 import { RelationshipCategory, SortField, SortOrder, AccountItem, DataSourceMode } from '../types/analytics';
 import {
   getSnapshots,
@@ -26,18 +36,81 @@ import { LiveSyncOptions, LiveSyncResult } from '../services/live/liveTypes';
 export const useAppStore = create<AppState>((set, get) => ({
   // Theme state
   theme: 'dark',
+  activeThemeId: DEFAULT_THEME_ID,
+
+  setThemeId: (themeId: ThemeId) => {
+    const validId = THEMES[themeId] ? themeId : DEFAULT_THEME_ID;
+    set({
+      activeThemeId: validId,
+      theme: THEMES[validId].appearance === 'dark' ? 'dark' : 'light',
+    });
+    applyThemeToDocument(validId);
+    persistThemeId(validId);
+  },
+
   setTheme: (theme: ThemeMode) => {
     set({ theme });
     if (typeof document !== 'undefined') {
       const root = document.documentElement;
       if (theme === 'dark') {
         root.classList.add('dark');
+        const currentId = get().activeThemeId;
+        if (THEMES[currentId]?.appearance !== 'dark') {
+          get().setThemeId('slate_sand');
+        }
       } else if (theme === 'light') {
         root.classList.remove('dark');
+        const currentId = get().activeThemeId;
+        if (THEMES[currentId]?.appearance !== 'light') {
+          get().setThemeId('sunset_bloom');
+        }
       } else {
         const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         root.classList.toggle('dark', isDark);
+        get().setThemeId(isDark ? 'slate_sand' : 'sunset_bloom');
       }
+    }
+  },
+
+  // Onboarding System
+  isOnboardingCompleted: false,
+  onboardingStep: 1,
+  customUsername: '',
+
+  setOnboardingStep: (step: number) => {
+    set({ onboardingStep: step });
+    persistOnboardingStep(step);
+  },
+
+  setCustomUsername: (username: string) => {
+    const clean = username.trim().replace(/^@/, '');
+    set({ customUsername: clean });
+    persistUsername(clean);
+  },
+
+  completeOnboarding: async () => {
+    set({ isOnboardingCompleted: true });
+    await markOnboardingCompleted();
+  },
+
+  resetOnboarding: async () => {
+    set({ isOnboardingCompleted: false, onboardingStep: 1 });
+    await resetOnboardingFlow();
+  },
+
+  initOnboardingState: async () => {
+    try {
+      const state = await getOnboardingState();
+      set({
+        isOnboardingCompleted: state.isOnboardingCompleted,
+        onboardingStep: state.onboardingStep,
+        activeThemeId: state.themeId,
+        customUsername: state.username,
+        theme: THEMES[state.themeId]?.appearance === 'dark' ? 'dark' : 'light',
+      });
+      applyThemeToDocument(state.themeId);
+    } catch {
+      applyThemeToDocument(DEFAULT_THEME_ID);
     }
   },
 

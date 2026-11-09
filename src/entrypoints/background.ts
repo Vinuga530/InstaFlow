@@ -57,8 +57,12 @@ export default defineBackground(() => {
   chrome.runtime.onInstalled.addListener((details) => {
     logTabDebug('SW', `chrome.runtime.onInstalled: reason=${details.reason}`);
     if (details.reason === 'install') {
+      chrome.storage.local.set({
+        instaflow_onboarding_completed: false,
+        instaflow_onboarding_step: 1,
+      }).catch(() => {});
       chrome.tabs.create({
-        url: chrome.runtime.getURL('dashboard.html'),
+        url: chrome.runtime.getURL('dashboard.html#onboarding'),
       });
     }
     triggerTabDetection('onInstalled');

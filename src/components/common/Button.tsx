@@ -22,7 +22,7 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-150 select-none active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#71806C]/30 dark:focus-visible:ring-[#899783]/30';
+    'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-150 select-none active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]/40';
 
   const sizeStyles = {
     xs: 'text-[11px] px-3 py-1 gap-1.5 min-h-[30px]',
@@ -33,15 +33,15 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantStyles = {
     primary:
-      'bg-[#71806C] hover:bg-[#606E5B] dark:bg-[#899783] dark:hover:bg-[#98A792] text-[#F5F3EC] dark:text-[#151716] shadow-subtle font-medium',
+      'bg-[var(--accent-primary)] hover:opacity-90 text-[var(--bg-canvas)] shadow-subtle font-semibold',
     gradient:
-      'bg-[#71806C] hover:bg-[#606E5B] dark:bg-[#899783] dark:hover:bg-[#98A792] text-[#F5F3EC] dark:text-[#151716] shadow-subtle font-medium',
+      'bg-[var(--accent-primary)] hover:opacity-90 text-[var(--bg-canvas)] shadow-subtle font-semibold',
     secondary:
-      'bg-[#EAE8DF] dark:bg-[#202421] hover:bg-[#E2DFD6] dark:hover:bg-[#272C28] text-[#242823] dark:text-[#F0EEE6] border border-[#D5D2C5] dark:border-[#343B35] shadow-subtle',
+      'bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-primary)] border border-[var(--border-subtle)] shadow-subtle',
     ghost:
-      'hover:bg-[#E2DFD6]/60 dark:hover:bg-[#272C28]/60 text-[#686E64] dark:text-[#A6AA9D] hover:text-[#242823] dark:hover:text-[#F0EEE6]',
+      'hover:bg-[var(--bg-surface-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]',
     danger:
-      'bg-[#A33F31]/10 hover:bg-[#A33F31]/15 active:bg-[#A33F31]/20 text-[#A33F31] dark:text-[#C45B4B] dark:bg-[#C45B4B]/15 border border-[#A33F31]/20 dark:border-[#C45B4B]/25',
+      'bg-[var(--status-negative-bg)] hover:opacity-90 active:opacity-100 text-[var(--status-negative)] border border-[var(--status-negative)]/25',
   };
 
   return (

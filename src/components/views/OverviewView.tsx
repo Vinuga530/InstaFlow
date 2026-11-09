@@ -17,11 +17,9 @@ import {
   Sparkles,
   ExternalLink,
   Activity,
-  History,
   ChevronRight,
   ArrowRight,
-  Heart,
-  Smile,
+  Compass,
 } from 'lucide-react';
 
 export const OverviewView: React.FC = () => {
@@ -35,6 +33,7 @@ export const OverviewView: React.FC = () => {
     unfollowers,
     newFollowers,
     liveStatus,
+    customUsername,
     setActiveCategory,
     setDataSourceMode,
     setImportModalOpen,
@@ -66,16 +65,16 @@ export const OverviewView: React.FC = () => {
 
   if (!activeSnapshot) {
     const isTabDetected = !!liveStatus?.isInstagramTabOpen;
-    const detectedUsername = liveStatus?.activeTab?.detectedUsername;
+    const detectedUsername = liveStatus?.activeTab?.detectedUsername || customUsername;
 
     return (
       <div className="p-8 max-w-3xl mx-auto space-y-6">
         <EmptyState
           icon={
             isTabDetected ? (
-              <Activity className="w-8 h-8 text-emerald-500 animate-pulse" />
+              <Activity className="w-8 h-8 text-[var(--accent-primary)] animate-pulse" />
             ) : (
-              <Smile className="w-8 h-8 text-[#E05A47]" />
+              <Compass className="w-8 h-8 text-[var(--accent-primary)]" />
             )
           }
           title={
@@ -88,7 +87,7 @@ export const OverviewView: React.FC = () => {
           description={
             isTabDetected
               ? 'Your Instagram tab is connected. Run a scan to see who unfollowed you and who is not following you back.'
-              : 'Open Instagram in your browser to scan who unfollowed you, or import an Instagram data export.'
+              : 'Open Instagram in your browser to scan who unfollowed you, or import an official Instagram data archive.'
           }
           actionLabel={isTabDetected ? 'Scan Account Now' : 'Open Live Scanner'}
           onAction={() => setActiveCategory('live_mode')}
@@ -106,7 +105,7 @@ export const OverviewView: React.FC = () => {
           <Button
             variant="ghost"
             size="sm"
-            leftIcon={<Sparkles className="w-3.5 h-3.5 text-amber-500" />}
+            leftIcon={<Sparkles className="w-3.5 h-3.5 text-[var(--status-warning)]" />}
             onClick={handleSeedSample}
           >
             Load Demo Comparison
@@ -122,39 +121,37 @@ export const OverviewView: React.FC = () => {
     following.length > 0 ? Math.round((mutuals.length / following.length) * 1000) / 10 : 0;
   const netGrowth = newFollowers.length - unfollowers.length;
 
+  const displayHandle = activeSnapshot.accountUsername || customUsername || 'account';
+
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-6">
-      {/* ============================================================ */}
-      {/* SECTION A — Cozy Account Identity Card                      */}
-      {/* ============================================================ */}
-      <section className="rounded-2xl border border-[#D5D2C5] dark:border-[#343B35] bg-[#EAE8DF] dark:bg-[#202421] p-5 sm:p-6 shadow-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-6 animate-in fade-in duration-200">
+      {/* SECTION A — Account Identity Card */}
+      <section className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 sm:p-6 shadow-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           {/* Account Avatar */}
-          <div className="w-12 h-12 rounded-xl bg-[#71806C]/15 dark:bg-[#899783]/20 border border-[#71806C]/30 dark:border-[#899783]/35 flex items-center justify-center text-[#505D4A] dark:text-[#C5D2C0] shadow-subtle shrink-0">
-            <span className="font-semibold text-lg uppercase">
-              {(activeSnapshot.accountUsername || 'M')[0]}
-            </span>
+          <div className="w-12 h-12 rounded-xl bg-[var(--accent-subtle)] border border-[var(--accent-primary)]/30 flex items-center justify-center text-[var(--accent-primary)] shadow-subtle shrink-0 font-bold text-lg uppercase">
+            {displayHandle[0] || '@'}
           </div>
 
           <div className="space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-lg font-medium tracking-tight text-[#242823] dark:text-[#F0EEE6]">
-                @{activeSnapshot.accountUsername || 'instagram_account'}
+              <h1 className="text-lg font-bold tracking-tight text-[var(--text-primary)]">
+                @{displayHandle}
               </h1>
-              <span className="text-[11px] px-2.5 py-0.5 rounded-full font-medium bg-[#E2DFD6] dark:bg-[#272C28] text-[#686E64] dark:text-[#A6AA9D] border border-[#D5D2C5] dark:border-[#343B35]">
+              <span className="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-[var(--bg-surface-subtle)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
                 {activeSnapshot.label}
               </span>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5 text-xs text-[#686E64] dark:text-[#A6AA9D]">
+            <div className="flex flex-wrap items-center gap-2.5 text-xs text-[var(--text-secondary)]">
               {/* Connection Status Pill */}
-              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#E2DFD6] dark:bg-[#272C28] border border-[#D5D2C5] dark:border-[#343B35]">
+              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--bg-surface-subtle)] border border-[var(--border-subtle)]">
                 <span
                   className={`w-2 h-2 rounded-full shrink-0 ${
-                    isTabDetected ? 'bg-[#71806C] dark:bg-[#899783] animate-pulse' : 'bg-[#BCB8A9] dark:bg-[#444E46]'
+                    isTabDetected ? 'bg-[var(--status-positive)] animate-pulse' : 'bg-[var(--border-strong)]'
                   }`}
                 />
-                <span className={isTabDetected ? 'text-[#242823] dark:text-[#F0EEE6] font-medium' : 'text-[#686E64] dark:text-[#A6AA9D]'}>
+                <span className={isTabDetected ? 'text-[var(--text-primary)] font-semibold' : 'text-[var(--text-secondary)]'}>
                   {isTabDetected
                     ? detectedUsername
                       ? `Instagram active (@${detectedUsername})`
@@ -163,7 +160,7 @@ export const OverviewView: React.FC = () => {
                 </span>
               </span>
 
-              <span>•</span>
+              <span>&bull;</span>
 
               {/* Last Data Refresh */}
               <span>
@@ -198,11 +195,9 @@ export const OverviewView: React.FC = () => {
         </div>
       </section>
 
-      {/* ============================================================ */}
-      {/* SECTION B — Relationship Statistics (Quiet 4-Grid)           */}
-      {/* ============================================================ */}
+      {/* SECTION B — Relationship Statistics (4-Grid) */}
       <section className="space-y-2.5">
-        <h2 className="text-xs font-semibold text-[#8D9387] dark:text-[#72776C] uppercase tracking-wider px-1">
+        <h2 className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider px-1">
           Relationship Overview
         </h2>
 
@@ -212,8 +207,8 @@ export const OverviewView: React.FC = () => {
             value={followers.length}
             subtext="Accounts following you"
             icon={<Users className="w-4 h-4" />}
-            iconColor="text-[#686E64] dark:text-[#A6AA9D]"
-            iconBg="bg-[#E2DFD6] dark:bg-[#272C28]"
+            iconColor="text-[var(--text-secondary)]"
+            iconBg="bg-[var(--bg-surface-subtle)]"
             onClick={() => setActiveCategory('followers')}
           />
 
@@ -222,8 +217,8 @@ export const OverviewView: React.FC = () => {
             value={following.length}
             subtext="Accounts you follow"
             icon={<UserCheck className="w-4 h-4" />}
-            iconColor="text-[#686E64] dark:text-[#A6AA9D]"
-            iconBg="bg-[#E2DFD6] dark:bg-[#272C28]"
+            iconColor="text-[var(--text-secondary)]"
+            iconBg="bg-[var(--bg-surface-subtle)]"
             onClick={() => setActiveCategory('following')}
           />
 
@@ -232,8 +227,8 @@ export const OverviewView: React.FC = () => {
             value={mutuals.length}
             subtext={`${followBackRatio}% reciprocal`}
             icon={<Users2 className="w-4 h-4" />}
-            iconColor="text-[#71806C] dark:text-[#899783]"
-            iconBg="bg-[#71806C]/10 dark:bg-[#899783]/15"
+            iconColor="text-[var(--status-positive)]"
+            iconBg="bg-[var(--status-positive-bg)]"
             onClick={() => setActiveCategory('mutuals')}
           />
 
@@ -242,29 +237,27 @@ export const OverviewView: React.FC = () => {
             value={notFollowingBack.length}
             subtext="You follow, they do not"
             icon={<ArrowUpRight className="w-4 h-4" />}
-            iconColor="text-[#9E7E43] dark:text-[#C0A268]"
-            iconBg="bg-[#9E7E43]/10 dark:bg-[#C0A268]/15"
+            iconColor="text-[var(--status-warning)]"
+            iconBg="bg-[var(--status-warning-bg)]"
             active={notFollowingBack.length > 0}
             onClick={() => setActiveCategory('not_following_back')}
           />
         </div>
       </section>
 
-      {/* ============================================================ */}
-      {/* SECTION C — Recent Changes & Snapshot Comparison            */}
-      {/* ============================================================ */}
+      {/* SECTION C — Recent Changes & Snapshot Comparison */}
       <section className="space-y-3">
         <div className="flex items-center justify-between px-1">
-          <h2 className="text-xs font-semibold text-[#8D9387] dark:text-[#72776C] uppercase tracking-wider">
+          <h2 className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">
             Recent Changes
           </h2>
 
           {snapshots.length > 1 && (
             <span
-              className={`text-xs font-medium tabular-nums px-2.5 py-0.5 rounded-full ${
+              className={`text-xs font-semibold tabular-nums px-2.5 py-0.5 rounded-full ${
                 netGrowth >= 0
-                  ? 'bg-[#71806C]/15 text-[#5A6755] dark:text-[#A6B5A0]'
-                  : 'bg-[#A33F31]/10 text-[#8A3226] dark:text-[#DC7C6E]'
+                  ? 'bg-[var(--status-positive-bg)] text-[var(--status-positive)]'
+                  : 'bg-[var(--status-negative-bg)] text-[var(--status-negative)]'
               }`}
             >
               Net change: {netGrowth >= 0 ? `+${netGrowth}` : netGrowth} followers
@@ -273,13 +266,13 @@ export const OverviewView: React.FC = () => {
         </div>
 
         {snapshots.length < 2 ? (
-          <div className="p-6 rounded-2xl border border-[#D5D2C5] dark:border-[#343B35] bg-[#EAE8DF] dark:bg-[#202421] text-center space-y-2 shadow-subtle">
-            <p className="text-xs text-[#686E64] dark:text-[#A6AA9D]">
+          <div className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-center space-y-2 shadow-subtle">
+            <p className="text-xs text-[var(--text-secondary)]">
               Only 1 snapshot recorded so far. Import a second data export later to detect unfollowers and new followers over time.
             </p>
             <button
               onClick={() => setActiveCategory('history')}
-              className="text-xs font-medium text-[#71806C] dark:text-[#899783] hover:underline inline-flex items-center gap-1 pt-1"
+              className="text-xs font-semibold text-[var(--accent-primary)] hover:underline inline-flex items-center gap-1 pt-1"
             >
               <span>View snapshot history</span>
               <ArrowRight className="w-3 h-3" />
@@ -288,20 +281,20 @@ export const OverviewView: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Lost Followers (Unfollowers) */}
-            <div className="p-4 sm:p-5 rounded-2xl border border-[#D5D2C5] dark:border-[#343B35] bg-[#EAE8DF] dark:bg-[#202421] space-y-3 shadow-subtle">
-              <div className="flex items-center justify-between pb-2.5 border-b border-[#D5D2C5] dark:border-[#343B35]">
+            <div className="p-4 sm:p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-3 shadow-subtle">
+              <div className="flex items-center justify-between pb-2.5 border-b border-[var(--border-subtle)]">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-[#A33F31]/10 text-[#8A3226] dark:text-[#DC7C6E] flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-lg bg-[var(--status-negative-bg)] text-[var(--status-negative)] flex items-center justify-center">
                     <UserMinus className="w-3.5 h-3.5" />
                   </div>
-                  <h3 className="text-xs font-medium text-[#242823] dark:text-[#F0EEE6]">
+                  <h3 className="text-xs font-bold text-[var(--text-primary)]">
                     Lost Followers ({unfollowers.length})
                   </h3>
                 </div>
                 {unfollowers.length > 0 && (
                   <button
                     onClick={() => setActiveCategory('unfollowers')}
-                    className="text-[11px] font-medium text-[#A33F31] dark:text-[#DC7C6E] hover:underline flex items-center gap-0.5"
+                    className="text-[11px] font-semibold text-[var(--status-negative)] hover:underline flex items-center gap-0.5"
                   >
                     <span>View all</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -310,17 +303,17 @@ export const OverviewView: React.FC = () => {
               </div>
 
               {unfollowers.length === 0 ? (
-                <p className="text-xs text-[#8D9387] dark:text-[#72776C] py-6 text-center">
+                <p className="text-xs text-[var(--text-tertiary)] py-6 text-center">
                   No accounts stopped following you between snapshots.
                 </p>
               ) : (
-                <div className="divide-y divide-[#D5D2C5]/60 dark:divide-[#343B35]/60">
+                <div className="divide-y divide-[var(--border-subtle)]">
                   {unfollowers.slice(0, 4).map((acc) => (
                     <div
                       key={acc.username}
                       className="py-2.5 flex items-center justify-between text-xs"
                     >
-                      <span className="font-medium text-[#242823] dark:text-[#F0EEE6] truncate max-w-[180px]">
+                      <span className="font-semibold text-[var(--text-primary)] truncate max-w-[180px]">
                         @{acc.username}
                       </span>
                       <div className="flex items-center gap-2">
@@ -329,7 +322,7 @@ export const OverviewView: React.FC = () => {
                           href={acc.profileUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[#8D9387] hover:text-[#A33F31] dark:hover:text-[#DC7C6E] p-1"
+                          className="text-[var(--text-tertiary)] hover:text-[var(--status-negative)] p-1"
                           title="Open Profile"
                         >
                           <ExternalLink className="w-3 h-3" />
@@ -342,20 +335,20 @@ export const OverviewView: React.FC = () => {
             </div>
 
             {/* New Followers Gained */}
-            <div className="p-4 sm:p-5 rounded-2xl border border-[#D5D2C5] dark:border-[#343B35] bg-[#EAE8DF] dark:bg-[#202421] space-y-3 shadow-subtle">
-              <div className="flex items-center justify-between pb-2.5 border-b border-[#D5D2C5] dark:border-[#343B35]">
+            <div className="p-4 sm:p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-3 shadow-subtle">
+              <div className="flex items-center justify-between pb-2.5 border-b border-[var(--border-subtle)]">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-[#71806C]/15 text-[#5A6755] dark:text-[#A6B5A0] flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-lg bg-[var(--status-positive-bg)] text-[var(--status-positive)] flex items-center justify-center">
                     <UserPlus className="w-3.5 h-3.5" />
                   </div>
-                  <h3 className="text-xs font-medium text-[#242823] dark:text-[#F0EEE6]">
+                  <h3 className="text-xs font-bold text-[var(--text-primary)]">
                     New Followers ({newFollowers.length})
                   </h3>
                 </div>
                 {newFollowers.length > 0 && (
                   <button
                     onClick={() => setActiveCategory('new_followers')}
-                    className="text-[11px] font-medium text-[#71806C] dark:text-[#899783] hover:underline flex items-center gap-0.5"
+                    className="text-[11px] font-semibold text-[var(--status-positive)] hover:underline flex items-center gap-0.5"
                   >
                     <span>View all</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -364,17 +357,17 @@ export const OverviewView: React.FC = () => {
               </div>
 
               {newFollowers.length === 0 ? (
-                <p className="text-xs text-[#8D9387] dark:text-[#72776C] py-6 text-center">
+                <p className="text-xs text-[var(--text-tertiary)] py-6 text-center">
                   No new followers gained between snapshots.
                 </p>
               ) : (
-                <div className="divide-y divide-[#D5D2C5]/60 dark:divide-[#343B35]/60">
+                <div className="divide-y divide-[var(--border-subtle)]">
                   {newFollowers.slice(0, 4).map((acc) => (
                     <div
                       key={acc.username}
                       className="py-2.5 flex items-center justify-between text-xs"
                     >
-                      <span className="font-medium text-[#242823] dark:text-[#F0EEE6] truncate max-w-[180px]">
+                      <span className="font-semibold text-[var(--text-primary)] truncate max-w-[180px]">
                         @{acc.username}
                       </span>
                       <div className="flex items-center gap-2">
@@ -383,7 +376,7 @@ export const OverviewView: React.FC = () => {
                           href={acc.profileUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[#8D9387] hover:text-[#71806C] dark:hover:text-[#899783] p-1"
+                          className="text-[var(--text-tertiary)] hover:text-[var(--status-positive)] p-1"
                           title="Open Profile"
                         >
                           <ExternalLink className="w-3 h-3" />

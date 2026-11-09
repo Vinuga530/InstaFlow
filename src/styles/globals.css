@@ -5,8 +5,8 @@
 @font-face {
   font-family: 'Fredoka One';
   src: url('../assets/fonts/FredokaOne-Regular.ttf') format('truetype'),
-       url('../assets/fonts/FredokaOne-Regular.otf') format('opentype'),
-       url('/fonts/FredokaOne-Regular.ttf') format('truetype');
+    url('../assets/fonts/FredokaOne-Regular.otf') format('opentype'),
+    url('/fonts/FredokaOne-Regular.ttf') format('truetype');
   font-weight: 400 700;
   font-style: normal;
   font-display: swap;
@@ -15,7 +15,7 @@
 @font-face {
   font-family: 'Cassandra';
   src: url('../assets/fonts/Cassandra.ttf') format('truetype'),
-       url('/fonts/Cassandra.ttf') format('truetype');
+    url('/fonts/Cassandra.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -26,32 +26,89 @@
 }
 
 @layer base {
+  /* Default: Slate & Sand (Theme 01) */
   :root {
-    --bg-canvas: #F5F3EC;
-    --bg-surface: #EAE8DF;
-    --bg-surface-subtle: #E2DFD6;
-    --bg-surface-hover: #DCD9CE;
-    --border-subtle: #D5D2C5;
-    --border-strong: #BCB8A9;
-    --text-primary: #242823;
-    --text-secondary: #686E64;
-    --text-tertiary: #8D9387;
-    --accent-primary: #71806C;
-    --accent-subtle: rgba(113, 128, 108, 0.12);
-    --accent-hover: #606E5B;
-
-    /* Semantic Status (Quiet & Muted) */
-    --status-success: #71806C;
-    --status-success-bg: rgba(113, 128, 108, 0.12);
-    --status-danger: #A33F31;
-    --status-danger-bg: rgba(163, 63, 49, 0.10);
-    --status-warning: #9E7E43;
-    --status-warning-bg: rgba(158, 126, 67, 0.12);
+    --bg-canvas: #222831;
+    --bg-surface: #2D343E;
+    --bg-surface-elevated: #393E46;
+    --bg-surface-subtle: #262D36;
+    --bg-surface-hover: #3F4652;
+    --border-subtle: #3E4652;
+    --border-strong: #535D6C;
+    --text-primary: #DFD0B8;
+    --text-secondary: #948979;
+    --text-tertiary: #786F62;
+    --accent-primary: #DFD0B8;
+    --accent-secondary: #948979;
+    --accent-hover: #EBE0CE;
+    --accent-subtle: rgba(223, 208, 184, 0.14);
+    --status-positive: #88BA7F;
+    --status-positive-bg: rgba(136, 186, 127, 0.15);
+    --status-warning: #E0B56A;
+    --status-warning-bg: rgba(224, 181, 106, 0.15);
+    --status-negative: #DE685A;
+    --status-negative-bg: rgba(222, 104, 90, 0.15);
+    --status-info: #8AAEC8;
+    --status-info-bg: rgba(138, 174, 200, 0.15);
   }
 
-  .dark {
+  /* Theme 01: Slate & Sand */
+  [data-theme="slate_sand"] {
+    --bg-canvas: #222831;
+    --bg-surface: #2D343E;
+    --bg-surface-elevated: #393E46;
+    --bg-surface-subtle: #262D36;
+    --bg-surface-hover: #3F4652;
+    --border-subtle: #3E4652;
+    --border-strong: #535D6C;
+    --text-primary: #DFD0B8;
+    --text-secondary: #948979;
+    --text-tertiary: #786F62;
+    --accent-primary: #DFD0B8;
+    --accent-secondary: #948979;
+    --accent-hover: #EBE0CE;
+    --accent-subtle: rgba(223, 208, 184, 0.14);
+    --status-positive: #88BA7F;
+    --status-positive-bg: rgba(136, 186, 127, 0.15);
+    --status-warning: #E0B56A;
+    --status-warning-bg: rgba(224, 181, 106, 0.15);
+    --status-negative: #DE685A;
+    --status-negative-bg: rgba(222, 104, 90, 0.15);
+    --status-info: #8AAEC8;
+    --status-info-bg: rgba(138, 174, 200, 0.15);
+  }
+
+  /* Theme 02: Sunset Bloom */
+  [data-theme="sunset_bloom"] {
+    --bg-canvas: #FFF1D3;
+    --bg-surface: #FFE5C5;
+    --bg-surface-elevated: #FFF7E6;
+    --bg-surface-subtle: #F9D9B4;
+    --bg-surface-hover: #F4CCA3;
+    --border-subtle: #ECC19E;
+    --border-strong: #CA5995;
+    --text-primary: #5D1C6A;
+    --text-secondary: #8B3873;
+    --text-tertiary: #B36A89;
+    --accent-primary: #CA5995;
+    --accent-secondary: #FFB090;
+    --accent-hover: #B54782;
+    --accent-subtle: rgba(202, 89, 149, 0.14);
+    --status-positive: #368A50;
+    --status-positive-bg: rgba(54, 138, 80, 0.14);
+    --status-warning: #C67400;
+    --status-warning-bg: rgba(198, 116, 0, 0.14);
+    --status-negative: #C83248;
+    --status-negative-bg: rgba(200, 50, 72, 0.14);
+    --status-info: #5D1C6A;
+    --status-info-bg: rgba(93, 28, 106, 0.12);
+  }
+
+  /* Theme 03: Quiet Obsidian (Dark) */
+  [data-theme="quiet_dark"] {
     --bg-canvas: #151716;
     --bg-surface: #202421;
+    --bg-surface-elevated: #2A302C;
     --bg-surface-subtle: #272C28;
     --bg-surface-hover: #2E342F;
     --border-subtle: #343B35;
@@ -60,16 +117,43 @@
     --text-secondary: #A6AA9D;
     --text-tertiary: #72776C;
     --accent-primary: #899783;
-    --accent-subtle: rgba(137, 151, 131, 0.15);
+    --accent-secondary: #686E64;
     --accent-hover: #98A792;
-
-    /* Semantic Status (Quiet & Muted) */
-    --status-success: #899783;
-    --status-success-bg: rgba(137, 151, 131, 0.15);
-    --status-danger: #C45B4B;
-    --status-danger-bg: rgba(196, 91, 75, 0.15);
+    --accent-subtle: rgba(137, 151, 131, 0.15);
+    --status-positive: #899783;
+    --status-positive-bg: rgba(137, 151, 131, 0.15);
     --status-warning: #C0A268;
     --status-warning-bg: rgba(192, 162, 104, 0.15);
+    --status-negative: #C45B4B;
+    --status-negative-bg: rgba(196, 91, 75, 0.15);
+    --status-info: #7B96A8;
+    --status-info-bg: rgba(123, 150, 168, 0.15);
+  }
+
+  /* Theme 04: Quiet Parchment (Light) */
+  [data-theme="quiet_light"] {
+    --bg-canvas: #F5F3EC;
+    --bg-surface: #EAE8DF;
+    --bg-surface-elevated: #FFFFFF;
+    --bg-surface-subtle: #E2DFD6;
+    --bg-surface-hover: #DCD9CE;
+    --border-subtle: #D5D2C5;
+    --border-strong: #BCB8A9;
+    --text-primary: #242823;
+    --text-secondary: #686E64;
+    --text-tertiary: #8D9387;
+    --accent-primary: #71806C;
+    --accent-secondary: #8D9387;
+    --accent-hover: #606E5B;
+    --accent-subtle: rgba(113, 128, 108, 0.12);
+    --status-positive: #71806C;
+    --status-positive-bg: rgba(113, 128, 108, 0.12);
+    --status-warning: #9E7E43;
+    --status-warning-bg: rgba(158, 126, 67, 0.12);
+    --status-negative: #A33F31;
+    --status-negative-bg: rgba(163, 63, 49, 0.10);
+    --status-info: #58748C;
+    --status-info-bg: rgba(88, 116, 140, 0.12);
   }
 
   body {
@@ -89,12 +173,19 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Quiet editorial card styling */
+/* Material 3 Expressive and Editorial Card Styling */
 .surface-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.surface-elevated {
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 /* Soft understated scrollbar */
@@ -117,6 +208,9 @@
 }
 
 /* Soft, comfortable micro-interactions */
-button, a, input, select {
+button,
+a,
+input,
+select {
   transition: all 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }

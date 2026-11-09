@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { Sidebar } from '../../components/layout/Sidebar';
 import { Header } from '../../components/layout/Header';
@@ -12,6 +12,7 @@ import { ImportModal } from '../../components/modals/ImportModal';
 import { BrowserGuideModal } from '../../components/modals/BrowserGuideModal';
 import { SnapshotCompareModal } from '../../components/modals/SnapshotCompareModal';
 import { AccountNotesModal } from '../../components/modals/AccountNotesModal';
+import { OnboardingFlow } from '../../components/onboarding/OnboardingFlow';
 import { Loader2 } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -19,19 +20,25 @@ export const App: React.FC = () => {
     activeCategory,
     setActiveCategory,
     loadSnapshots,
-    theme,
-    setTheme,
+    isOnboardingCompleted,
+    initOnboardingState,
     isLoading,
     loadingMessage,
   } = useAppStore();
 
-  useEffect(() => {
-    // Initialize theme
-    setTheme(theme);
-    // Load historical snapshots from Dexie
-    loadSnapshots();
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [isOnboardingRoute, setIsOnboardingRoute] = useState(false);
 
-    // Check URL hash on initial load (e.g. dashboard.html#live_mode)
+  useEffect(() => {
+    const initialize = async () => {
+      await initOnboardingState();
+      await loadSnapshots();
+      setIsInitializing(false);
+    };
+
+    initialize();
+
+    // Check URL hash on initial load (e.g. dashboard.html#onboarding or dashboard.html#live_mode)
     const validCategories = [
       'overview',
       'followers',
@@ -47,9 +54,14 @@ export const App: React.FC = () => {
     ];
 
     const syncHashCategory = () => {
-      const hash = window.location.hash.replace('#', '').trim();
-      if (hash && validCategories.includes(hash)) {
-        setActiveCategory(hash as any);
+      const rawHash = window.location.hash.replace('#', '').trim();
+      if (rawHash === 'onboarding') {
+        setIsOnboardingRoute(true);
+      } else {
+        setIsOnboardingRoute(false);
+        if (rawHash && validCategories.includes(rawHash)) {
+          setActiveCategory(rawHash as any);
+        }
       }
     };
 
@@ -80,8 +92,22 @@ export const App: React.FC = () => {
     }
   };
 
+  // Brief initial loading placeholder while retrieving storage state
+  if (isInitializing) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-[var(--bg-canvas)] text-[var(--text-primary)]">
+        <Loader2 className="w-8 h-8 text-[var(--accent-primary)] animate-spin" />
+      </div>
+    );
+  }
+
+  // Render full-screen Onboarding if incomplete or if navigating directly to #onboarding
+  if (!isOnboardingCompleted || isOnboardingRoute) {
+    return <OnboardingFlow onFinish={() => setIsOnboardingRoute(false)} />;
+  }
+
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#F5F3EC] dark:bg-[#151716] text-[#242823] dark:text-[#F0EEE6] font-sans selection:bg-[#71806C]/20 dark:selection:bg-[#899783]/25 selection:text-[#242823] dark:selection:text-[#F0EEE6]">
+    <div className="flex h-screen w-screen overflow-hidden bg-[var(--bg-canvas)] text-[var(--text-primary)] font-sans selection:bg-[var(--accent-subtle)] selection:text-[var(--text-primary)]">
       {/* Navigation Sidebar */}
       <Sidebar />
 
@@ -105,9 +131,9 @@ export const App: React.FC = () => {
       {/* Full-screen Loading Overlay */}
       {isLoading && (
         <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-[#EAE8DF]/95 dark:bg-[#202421]/95 border border-[#D5D2C5] dark:border-[#343B35] shadow-elevated">
-            <Loader2 className="w-7 h-7 text-[#71806C] dark:text-[#899783] animate-spin" />
-            <span className="text-sm font-medium text-[#242823] dark:text-[#F0EEE6]">
+          <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] shadow-elevated">
+            <Loader2 className="w-7 h-7 text-[var(--accent-primary)] animate-spin" />
+            <span className="text-sm font-medium text-[var(--text-primary)]">
               {loadingMessage || 'Processing...'}
             </span>
           </div>
@@ -116,4 +142,3 @@ export const App: React.FC = () => {
     </div>
   );
 };
-
