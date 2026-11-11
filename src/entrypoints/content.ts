@@ -767,8 +767,28 @@ export default defineContentScript({
 
       if (message?.type === 'UNFOLLOW_USER') {
         (async () => {
-          const targetId = message.userId;
+          let targetId = message.userId || '';
+          const uname = (message.username || '').trim().replace(/^@/, '');
+
           let csrf = getCookie('csrftoken') || '';
+          if (!csrf) {
+            const metaCsrf = document.querySelector('meta[name="csrf-token"]');
+            if (metaCsrf) csrf = metaCsrf.getAttribute('content') || '';
+          }
+          if (!csrf) {
+            const scripts = document.querySelectorAll('script');
+            for (const s of scripts) {
+              const text = s.textContent || '';
+              const m = text.match(/"csrf_token"\s*:\s*"([^"]+)"/);
+              if (m && m[1]) {
+                csrf = m[1];
+                break;
+              }
+            }
+          }
+          if (!csrf && (window as any)._sharedData?.config?.csrf_token) {
+            csrf = (window as any)._sharedData.config.csrf_token;
+          }
           if (!csrf) {
             try {
               const sRes = await fetch('/data/shared_data/', { credentials: 'include' });
@@ -778,24 +798,75 @@ export default defineContentScript({
               }
             } catch {}
           }
-          try {
-            const res = await fetch(`https://www.instagram.com/api/v1/friendships/destroy/${targetId}/`, {
-              method: 'POST',
-              headers: {
-                'x-ig-app-id': '936619743392459',
-                'x-asbd-id': '129477',
-                'x-csrftoken': csrf,
-                'x-requested-with': 'XMLHttpRequest',
-                'x-instagram-ajax': '1',
-                'content-type': 'application/x-www-form-urlencoded',
-              },
-              credentials: 'include',
-            });
-            const data = await res.json();
-            sendResponse({ success: data?.status === 'ok', data });
-          } catch (e: any) {
-            sendResponse({ success: false, error: e.message });
+
+          // If targetId is not provided, resolve via username
+          if (!targetId && uname) {
+            try {
+              const metaOwner = document.querySelector('meta[property="instapp:owner_user_id"]');
+              const ownerId = metaOwner?.getAttribute('content');
+              if (ownerId && /^\d+$/.test(ownerId)) {
+                targetId = ownerId;
+              }
+            } catch {}
+
+            if (!targetId) {
+              try {
+                const htmlRes = await fetch(`https://www.instagram.com/${encodeURIComponent(uname)}/`, { credentials: 'include' });
+                if (htmlRes.ok) {
+                  const html = await htmlRes.text();
+                  const mMatch = html.match(/<meta[^>]+property=["']instapp:owner_user_id["'][^>]+content=["'](\d+)["']/i) ||
+                    html.match(/<meta[^>]+content=["'](\d+)["'][^>]+property=["']instapp:owner_user_id["']/i);
+                  if (mMatch && mMatch[1]) targetId = mMatch[1];
+                }
+              } catch {}
+            }
           }
+
+          if (!targetId) {
+            sendResponse({ success: false, error: 'Could not resolve user ID to unfollow.' });
+            return;
+          }
+
+          const defaultHeaders: Record<string, string> = {
+            'x-ig-app-id': '936619743392459',
+            'x-asbd-id': '129477',
+            'x-requested-with': 'XMLHttpRequest',
+            'x-instagram-ajax': '1',
+            'content-type': 'application/x-www-form-urlencoded',
+          };
+          if (csrf) {
+            defaultHeaders['x-csrftoken'] = csrf;
+          }
+
+          const postBody = `user_id=${encodeURIComponent(targetId)}`;
+          const endpoints = [
+            `https://www.instagram.com/api/v1/friendships/destroy/${targetId}/`,
+            `https://www.instagram.com/api/v1/web/friendships/${targetId}/unfollow/`,
+          ];
+
+          let lastError = '';
+          for (const ep of endpoints) {
+            try {
+              const res = await fetch(ep, {
+                method: 'POST',
+                headers: defaultHeaders,
+                body: postBody,
+                credentials: 'include',
+              });
+              const data = await res.json();
+              if (data?.status === 'ok' || data?.friendship_status?.following === false || data?.following === false) {
+                sendResponse({ success: true, targetUserId: targetId, data });
+                return;
+              }
+              if (data?.feedback_message || data?.message) {
+                lastError = data.feedback_message || data.message;
+              }
+            } catch (e: any) {
+              lastError = e.message;
+            }
+          }
+
+          sendResponse({ success: false, error: lastError || 'Unfollow failed.' });
         })();
         return true;
       }

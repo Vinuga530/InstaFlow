@@ -529,7 +529,9 @@ export async function runFollowerExporter(
 }
 
 /**
- * Unfollows a user on Instagram via the active authenticated tab session
+ * Unfollows a user on Instagram via the active authenticated tab session.
+ * Uses a 5-tier waterfall resolution for the target's internal Instagram User ID (pk)
+ * and dual endpoints (/friendships/destroy/ and /friendships/.../unfollow/).
  */
 export async function unfollowInstagramUser(options: {
   tabId: number;
@@ -542,84 +544,263 @@ export async function unfollowInstagramUser(options: {
     throw new Error('Chrome scripting API unavailable.');
   }
 
-  const res = await chrome.scripting.executeScript({
-    target: { tabId },
-    func: async (uid: string, uname: string) => {
-      // 1. Resolve CSRF token
-      let csrfToken = '';
-      try {
-        const sRes = await fetch('/data/shared_data/', { credentials: 'include' });
-        if (sRes.ok) {
-          const sJson = await sRes.json();
-          csrfToken = sJson?.config?.csrf_token || '';
+  try {
+    const res = await chrome.scripting.executeScript({
+      target: { tabId },
+      func: async (uid: string, uname: string) => {
+        // Helper to extract cookie value
+        const getCookie = (name: string): string => {
+          const match = document.cookie.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
+          return match ? decodeURIComponent(match[1]) : '';
+        };
+
+        // 1. Multi-source CSRF token resolution
+        let csrfToken = getCookie('csrftoken');
+
+        if (!csrfToken) {
+          const metaCsrf = document.querySelector('meta[name="csrf-token"]');
+          if (metaCsrf) {
+            csrfToken = metaCsrf.getAttribute('content') || '';
+          }
         }
-      } catch {}
 
-      if (!csrfToken) {
-        const match = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]*)/);
-        if (match) csrfToken = decodeURIComponent(match[1]);
-      }
-
-      // 2. Resolve target user id if not provided
-      let finalId = uid;
-      if (!finalId) {
-        try {
-          const pRes = await fetch(
-            `https://www.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(uname)}`,
-            {
-              headers: {
-                'x-ig-app-id': '936619743392459',
-                'x-asbd-id': '129477',
-                'x-csrftoken': csrfToken,
-                'x-requested-with': 'XMLHttpRequest',
-              },
-              credentials: 'include',
+        if (!csrfToken) {
+          // Scan inline script tags for csrf_token
+          const scripts = document.querySelectorAll('script');
+          for (const s of scripts) {
+            const text = s.textContent || '';
+            const m = text.match(/"csrf_token"\s*:\s*"([^"]+)"/);
+            if (m && m[1]) {
+              csrfToken = m[1];
+              break;
             }
-          );
-          if (pRes.ok) {
-            const pJson = await pRes.json();
-            finalId = pJson?.data?.user?.id;
           }
-        } catch {}
-      }
+        }
 
-      if (!finalId) {
-        return { success: false, error: 'Could not resolve user ID to unfollow.' };
-      }
+        if (!csrfToken && (window as any)._sharedData?.config?.csrf_token) {
+          csrfToken = (window as any)._sharedData.config.csrf_token;
+        }
 
-      // 3. Post unfollow request
-      try {
-        const unfollowRes = await fetch(
+        if (!csrfToken) {
+          try {
+            const sRes = await fetch('/data/shared_data/', { credentials: 'include' });
+            if (sRes.ok) {
+              const sJson = await sRes.json();
+              csrfToken = sJson?.config?.csrf_token || '';
+            }
+          } catch {}
+        }
+
+        // 2. Multi-tier resolution for target user id
+        let finalId = uid ? String(uid).trim() : '';
+        const targetClean = uname.trim().toLowerCase().replace(/^@/, '');
+
+        // Strategy 1: Active Tab DOM if currently viewing target profile
+        if (!finalId) {
+          try {
+            const currentPath = window.location.pathname.replace(/^\/|\/$/g, '').toLowerCase();
+            if (currentPath === targetClean) {
+              const metaOwner = document.querySelector('meta[property="instapp:owner_user_id"]');
+              const ownerId = metaOwner?.getAttribute('content');
+              if (ownerId && /^\d+$/.test(ownerId)) {
+                finalId = ownerId;
+              } else {
+                const iosMeta = document.querySelector('meta[property="al:ios:url"]');
+                const iosHref = iosMeta?.getAttribute('content') || '';
+                const iosMatch = iosHref.match(/id=(\d+)/);
+                if (iosMatch && iosMatch[1]) {
+                  finalId = iosMatch[1];
+                }
+              }
+            }
+          } catch {}
+        }
+
+        // Strategy 2: Fetch target profile HTML and parse owner_user_id or script tags
+        if (!finalId) {
+          try {
+            const htmlRes = await fetch(`https://www.instagram.com/${encodeURIComponent(targetClean)}/`, {
+              credentials: 'include',
+            });
+            if (htmlRes.ok) {
+              const html = await htmlRes.text();
+              const metaMatch =
+                html.match(/<meta[^>]+property=["']instapp:owner_user_id["'][^>]+content=["'](\d+)["']/i) ||
+                html.match(/<meta[^>]+content=["'](\d+)["'][^>]+property=["']instapp:owner_user_id["']/i);
+              if (metaMatch && metaMatch[1]) {
+                finalId = metaMatch[1];
+              } else {
+                const scriptMatch =
+                  html.match(/"profilePage_(\d+)"/i) ||
+                  html.match(/"owner"\s*:\s*\{\s*"id"\s*:\s*"(\d+)"/i) ||
+                  html.match(/"user_id"\s*:\s*"(\d+)"/i) ||
+                  html.match(/"pk"\s*:\s*"(\d+)"/i);
+                if (scriptMatch && scriptMatch[1]) {
+                  finalId = scriptMatch[1];
+                }
+              }
+            }
+          } catch {}
+        }
+
+        // Strategy 3: Instagram Web Search / Topsearch API endpoint
+        if (!finalId) {
+          try {
+            const searchUrls = [
+              `https://www.instagram.com/api/v1/web/search/topsearch/?context=user&query=${encodeURIComponent(targetClean)}`,
+              `https://www.instagram.com/web/search/topsearch/?context=user&query=${encodeURIComponent(targetClean)}`,
+            ];
+            for (const sUrl of searchUrls) {
+              if (finalId) break;
+              const searchRes = await fetch(sUrl, {
+                headers: {
+                  'x-ig-app-id': '936619743392459',
+                  'x-asbd-id': '129477',
+                  'x-csrftoken': csrfToken,
+                  'x-requested-with': 'XMLHttpRequest',
+                },
+                credentials: 'include',
+              });
+              if (searchRes.ok) {
+                const sJson = await searchRes.json();
+                const users = sJson?.users || [];
+                const matched = users.find(
+                  (u: any) =>
+                    u?.user?.username?.toLowerCase() === targetClean
+                );
+                if (matched?.user) {
+                  const foundId = matched.user.pk || matched.user.pk_id || matched.user.id;
+                  if (foundId) finalId = String(foundId);
+                }
+              }
+            }
+          } catch {}
+        }
+
+        // Strategy 4: Web Profile Info API
+        if (!finalId) {
+          try {
+            const pRes = await fetch(
+              `https://www.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(targetClean)}`,
+              {
+                headers: {
+                  'x-ig-app-id': '936619743392459',
+                  'x-asbd-id': '129477',
+                  'x-csrftoken': csrfToken,
+                  'x-requested-with': 'XMLHttpRequest',
+                },
+                credentials: 'include',
+              }
+            );
+            if (pRes.ok) {
+              const pJson = await pRes.json();
+              const id = pJson?.data?.user?.id || pJson?.data?.user?.pk;
+              if (id) finalId = String(id);
+            }
+          } catch {}
+        }
+
+        // Strategy 5: Profile page with __a=1 query parameter
+        if (!finalId) {
+          try {
+            const aRes = await fetch(
+              `https://www.instagram.com/${encodeURIComponent(targetClean)}/?__a=1&__d=dis`,
+              {
+                headers: {
+                  'x-ig-app-id': '936619743392459',
+                  'x-requested-with': 'XMLHttpRequest',
+                },
+                credentials: 'include',
+              }
+            );
+            if (aRes.ok) {
+              const aJson = await aRes.json();
+              const id =
+                aJson?.graphql?.user?.id ||
+                aJson?.user?.id ||
+                aJson?.user?.pk ||
+                aJson?.data?.user?.id;
+              if (id) finalId = String(id);
+            }
+          } catch {}
+        }
+
+        if (!finalId) {
+          return {
+            success: false,
+            error: `Could not resolve user ID for @${uname}. Please open their profile or ensure you are logged into Instagram.`,
+          };
+        }
+
+        // 3. Post unfollow request with primary and fallback endpoints
+        const defaultHeaders: Record<string, string> = {
+          'x-ig-app-id': '936619743392459',
+          'x-asbd-id': '129477',
+          'x-requested-with': 'XMLHttpRequest',
+          'x-instagram-ajax': '1',
+          'content-type': 'application/x-www-form-urlencoded',
+        };
+        if (csrfToken) {
+          defaultHeaders['x-csrftoken'] = csrfToken;
+        }
+
+        const postBody = `user_id=${encodeURIComponent(finalId)}`;
+        const endpoints = [
           `https://www.instagram.com/api/v1/friendships/destroy/${finalId}/`,
-          {
-            method: 'POST',
-            headers: {
-              'x-ig-app-id': '936619743392459',
-              'x-asbd-id': '129477',
-              'x-csrftoken': csrfToken,
-              'x-requested-with': 'XMLHttpRequest',
-              'x-instagram-ajax': '1',
-              'content-type': 'application/x-www-form-urlencoded',
-            },
-            credentials: 'include',
-          }
-        );
-        const data = await unfollowRes.json();
-        return { success: data?.status === 'ok', targetUserId: finalId, data };
-      } catch (err: any) {
-        return { success: false, error: err?.message || 'Unfollow network request failed' };
-      }
-    },
-    args: [targetUserId || '', targetUsername],
-  });
+          `https://www.instagram.com/api/v1/web/friendships/${finalId}/unfollow/`,
+        ];
 
-  const scriptResult = res?.[0]?.result as any;
-  if (scriptResult?.success) {
-    return { success: true, targetUserId: scriptResult.targetUserId };
-  } else {
+        let lastError = '';
+        for (const endpoint of endpoints) {
+          try {
+            const unfollowRes = await fetch(endpoint, {
+              method: 'POST',
+              headers: defaultHeaders,
+              body: postBody,
+              credentials: 'include',
+            });
+
+            const data = await unfollowRes.json();
+            const isSuccess =
+              data?.status === 'ok' ||
+              data?.friendship_status?.following === false ||
+              data?.following === false;
+
+            if (isSuccess) {
+              return { success: true, targetUserId: finalId, data };
+            }
+
+            if (data?.message || data?.feedback_message) {
+              lastError = data.feedback_message || data.message;
+            }
+          } catch (postErr: any) {
+            lastError = postErr?.message || 'Network error';
+          }
+        }
+
+        return {
+          success: false,
+          targetUserId: finalId,
+          error: lastError || `Instagram rejected the unfollow request for @${uname}.`,
+        };
+      },
+      args: [targetUserId || '', targetUsername],
+    });
+
+    const scriptResult = res?.[0]?.result as any;
+    if (scriptResult?.success) {
+      return { success: true, targetUserId: scriptResult.targetUserId };
+    } else {
+      return {
+        success: false,
+        targetUserId: scriptResult?.targetUserId,
+        error: scriptResult?.error || `Failed to unfollow @${targetUsername}`,
+      };
+    }
+  } catch (err: any) {
     return {
       success: false,
-      error: scriptResult?.error || `Failed to unfollow @${targetUsername}`,
+      error: err?.message || `Execution error while unfollowing @${targetUsername}`,
     };
   }
 }

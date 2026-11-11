@@ -376,13 +376,35 @@ export async function runInPageScan(
 /**
  * Unfollows an Instagram account directly via authenticated API call.
  */
-export async function inPageUnfollow(targetUserId: string): Promise<{ success: boolean; error?: string }> {
+export async function inPageUnfollow(
+  targetUserId: string,
+  targetUsername?: string
+): Promise<{ success: boolean; error?: string }> {
   const getCookie = (name: string): string | null => {
-    const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    if (typeof document === 'undefined') return null;
+    const match = document.cookie?.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
     return match ? decodeURIComponent(match[1]) : null;
   };
 
   let csrfToken = getCookie('csrftoken') || '';
+  if (!csrfToken && typeof document !== 'undefined') {
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    if (meta) csrfToken = meta.getAttribute('content') || '';
+  }
+  if (!csrfToken && typeof document !== 'undefined') {
+    const scripts = document.querySelectorAll('script');
+    for (const s of scripts) {
+      const text = s.textContent || '';
+      const m = text.match(/"csrf_token"\s*:\s*"([^"]+)"/);
+      if (m && m[1]) {
+        csrfToken = m[1];
+        break;
+      }
+    }
+  }
+  if (!csrfToken && typeof window !== 'undefined' && (window as any)._sharedData?.config?.csrf_token) {
+    csrfToken = (window as any)._sharedData.config.csrf_token;
+  }
   if (!csrfToken) {
     try {
       const sRes = await fetch('/data/shared_data/', { credentials: 'include' });
@@ -393,32 +415,80 @@ export async function inPageUnfollow(targetUserId: string): Promise<{ success: b
     } catch {}
   }
 
-  try {
-    const res = await fetch(`https://www.instagram.com/api/v1/friendships/destroy/${targetUserId}/`, {
-      method: 'POST',
-      headers: {
-        'x-ig-app-id': APP_ID,
-        'x-asbd-id': '129477',
-        'x-csrftoken': csrfToken,
-        'x-requested-with': 'XMLHttpRequest',
-        'x-instagram-ajax': '1',
-        'content-type': 'application/x-www-form-urlencoded',
-      },
-      credentials: 'include',
-    });
-
-    if (res.status === 429) {
-      return { success: false, error: 'Instagram rate limit: please wait a few moments before unfollowing.' };
+  let finalId = targetUserId;
+  if (!finalId && targetUsername) {
+    const uname = targetUsername.trim().toLowerCase().replace(/^@/, '');
+    if (typeof document !== 'undefined') {
+      try {
+        const metaOwner = document.querySelector('meta[property="instapp:owner_user_id"]');
+        const ownerId = metaOwner?.getAttribute('content');
+        if (ownerId && /^\d+$/.test(ownerId)) {
+          finalId = ownerId;
+        }
+      } catch {}
     }
 
-    const data = await res.json();
-    if (data?.status === 'ok') {
-      return { success: true };
+    if (!finalId) {
+      try {
+        const htmlRes = await fetch(`https://www.instagram.com/${encodeURIComponent(uname)}/`, { credentials: 'include' });
+        if (htmlRes.ok) {
+          const html = await htmlRes.text();
+          const mMatch = html.match(/<meta[^>]+property=["']instapp:owner_user_id["'][^>]+content=["'](\d+)["']/i) ||
+            html.match(/<meta[^>]+content=["'](\d+)["'][^>]+property=["']instapp:owner_user_id["']/i);
+          if (mMatch && mMatch[1]) finalId = mMatch[1];
+        }
+      } catch {}
     }
-    return { success: false, error: data?.message || 'Could not unfollow account.' };
-  } catch (err: any) {
-    return { success: false, error: err?.message || 'Network request failed.' };
   }
+
+  if (!finalId) {
+    return { success: false, error: 'Could not resolve user ID to unfollow.' };
+  }
+
+  const defaultHeaders: Record<string, string> = {
+    'x-ig-app-id': APP_ID,
+    'x-asbd-id': '129477',
+    'x-requested-with': 'XMLHttpRequest',
+    'x-instagram-ajax': '1',
+    'content-type': 'application/x-www-form-urlencoded',
+  };
+  if (csrfToken) {
+    defaultHeaders['x-csrftoken'] = csrfToken;
+  }
+
+  const postBody = `user_id=${encodeURIComponent(finalId)}`;
+  const endpoints = [
+    `https://www.instagram.com/api/v1/friendships/destroy/${finalId}/`,
+    `https://www.instagram.com/api/v1/web/friendships/${finalId}/unfollow/`,
+  ];
+
+  let lastError = '';
+  for (const ep of endpoints) {
+    try {
+      const res = await fetch(ep, {
+        method: 'POST',
+        headers: defaultHeaders,
+        body: postBody,
+        credentials: 'include',
+      });
+
+      if (res.status === 429) {
+        return { success: false, error: 'Instagram rate limit: please wait a few moments before unfollowing.' };
+      }
+
+      const data = await res.json();
+      if (data?.status === 'ok' || data?.friendship_status?.following === false || data?.following === false) {
+        return { success: true };
+      }
+      if (data?.feedback_message || data?.message) {
+        lastError = data.feedback_message || data.message;
+      }
+    } catch (err: any) {
+      lastError = err?.message || 'Network request failed.';
+    }
+  }
+
+  return { success: false, error: lastError || 'Could not unfollow account.' };
 }
 
 /**

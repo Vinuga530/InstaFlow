@@ -30,6 +30,7 @@ import {
 import { compareSnapshots } from '../services/analytics/comparisons';
 import { NormalizedAccount } from '../types/instagram';
 import { liveIntegrationService } from '../services/live/liveIntegrationService';
+import { queryCurrentInstagramTabs } from '../services/live/tabDetectionService';
 import { unfollowInstagramUser } from '../services/live/followerExporterService';
 import { LiveSyncOptions, LiveSyncResult } from '../services/live/liveTypes';
 
@@ -553,7 +554,19 @@ export const useAppStore = create<AppState>((set, get) => ({
   // Unfollow account directly via active Instagram tab session
   unfollowAccount: async (targetUsername: string, targetUserId?: string) => {
     const norm = targetUsername.toLowerCase().trim();
-    const tabId = get().liveStatus?.activeTab?.id;
+    let tabId = get().liveStatus?.activeTab?.id;
+    if (!tabId) {
+      await get().fetchLiveStatus();
+      tabId = get().liveStatus?.activeTab?.id;
+    }
+
+    if (!tabId) {
+      try {
+        const tabState = await queryCurrentInstagramTabs();
+        tabId = tabState.activeTab?.id || tabState.tabs?.[0]?.id;
+      } catch {}
+    }
+
     if (!tabId) {
       get().addToast({
         type: 'error',
@@ -563,10 +576,20 @@ export const useAppStore = create<AppState>((set, get) => ({
       return false;
     }
 
+    let finalTargetUserId = targetUserId;
+    if (!finalTargetUserId) {
+      const match =
+        get().following.find((u) => u.username.toLowerCase() === norm) ||
+        get().followers.find((u) => u.username.toLowerCase() === norm);
+      if (match) {
+        finalTargetUserId = (match as any).userId || (match as any).id;
+      }
+    }
+
     try {
       const res = await unfollowInstagramUser({
         tabId,
-        targetUserId,
+        targetUserId: finalTargetUserId,
         targetUsername: norm,
       });
 

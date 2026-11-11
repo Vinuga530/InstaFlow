@@ -36,7 +36,7 @@ interface AccountRowProps {
   onToggleSelect: (username: string) => void;
   onToggleWhitelist: (username: string) => void;
   onOpenNotes: (account: AccountItem) => void;
-  onUnfollow?: (username: string) => void;
+  onUnfollow?: (username: string, userId?: string) => void;
 }
 
 const AccountRow = React.memo<AccountRowProps>(
@@ -138,7 +138,7 @@ const AccountRow = React.memo<AccountRowProps>(
           <div className="flex items-center justify-end gap-1.5">
             {account.isFollowing && onUnfollow && (
               <button
-                onClick={() => onUnfollow(account.username)}
+                onClick={() => onUnfollow(account.username, (account as any).userId || (account as any).id)}
                 disabled={isUnfollowing}
                 className="px-2 py-1 rounded-lg text-[11px] font-semibold text-[var(--status-negative)] bg-[var(--status-negative-bg)] hover:opacity-90 border border-[var(--status-negative)]/25 transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
                 title="Unfollow on Instagram"
@@ -215,15 +215,22 @@ export const AccountListView: React.FC = () => {
   const [unfollowingUser, setUnfollowingUser] = useState<string | null>(null);
 
   const handleUnfollow = useCallback(
-    async (uname: string) => {
+    async (uname: string, uid?: string) => {
       setUnfollowingUser(uname);
       try {
-        await unfollowAccount(uname);
+        const ok = await unfollowAccount(uname, uid);
+        if (ok) {
+          addToast({
+            type: 'success',
+            title: 'Unfollowed',
+            message: `Successfully unfollowed @${uname}.`,
+          });
+        }
       } finally {
         setUnfollowingUser(null);
       }
     },
-    [unfollowAccount]
+    [unfollowAccount, addToast]
   );
 
   const [searchInput, setSearchInput] = useState('');
