@@ -23,6 +23,8 @@ import {
   RefreshCw,
   Download,
   ArrowUpRight,
+  CheckCircle2,
+  Lock,
   Sparkles,
 } from 'lucide-react';
 
@@ -416,14 +418,35 @@ export const Popup: React.FC = () => {
                         {uname[0]?.toUpperCase() || '@'}
                       </div>
                       <div className="min-w-0">
-                        <a
-                          href={`https://www.instagram.com/${uname}/`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-xs font-semibold text-[var(--text-primary)] hover:underline truncate block leading-tight"
-                        >
-                          @{uname}
-                        </a>
+                        <div className="flex items-center gap-1">
+                          <a
+                            href={`https://www.instagram.com/${uname}/`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-xs font-semibold text-[var(--text-primary)] hover:underline truncate block leading-tight"
+                          >
+                            @{uname}
+                          </a>
+                          {Boolean((user as any).isVerified) && (
+                            <span title="Verified" className="inline-flex items-center">
+                              <CheckCircle2 className="w-3 h-3 text-blue-500 fill-blue-500/10 shrink-0" />
+                            </span>
+                          )}
+                          {Boolean((user as any).isPrivate) && (
+                            <span title="Private" className="inline-flex items-center">
+                              <Lock className="w-2.5 h-2.5 text-[var(--text-tertiary)] shrink-0" />
+                            </span>
+                          )}
+                          <span
+                            className={`text-[9px] px-1 py-0.2 rounded font-medium shrink-0 ${
+                              (user as any).accountType === 'page'
+                                ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400'
+                                : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                            }`}
+                          >
+                            {(user as any).accountType === 'page' ? 'Page' : 'Personal'}
+                          </span>
+                        </div>
                         {user.fullName && (
                           <span className="text-[10px] text-[var(--text-secondary)] truncate block leading-tight">
                             {user.fullName}

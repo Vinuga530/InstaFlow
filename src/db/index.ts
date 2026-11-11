@@ -222,6 +222,29 @@ export async function updateAccountNotes(username: string, notes: string, tags: 
 }
 
 /**
+ * Updates manual classification tag for an account ('personal' or 'page')
+ */
+export async function updateAccountClassification(username: string, type: 'personal' | 'page'): Promise<void> {
+  const norm = username.toLowerCase().trim();
+  const acc = await db.accounts.get(norm);
+  let tags = acc?.tags ? [...acc.tags] : [];
+  tags = tags.filter((t) => t !== 'personal' && t !== 'page' && t !== 'business' && t !== 'brand');
+  tags.push(type);
+
+  if (acc) {
+    await db.accounts.update(norm, { tags });
+  } else {
+    await db.accounts.put({
+      username: norm,
+      isWhitelisted: false,
+      tags,
+      firstSeen: Date.now(),
+      lastSeen: Date.now(),
+    });
+  }
+}
+
+/**
  * Clear all tables in database
  */
 export async function clearAllData(): Promise<void> {

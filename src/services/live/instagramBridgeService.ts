@@ -476,12 +476,31 @@ export async function inPageUnfollow(
         return { success: false, error: 'Instagram rate limit: please wait a few moments before unfollowing.' };
       }
 
-      const data = await res.json();
-      if (data?.status === 'ok' || data?.friendship_status?.following === false || data?.following === false) {
+      let isJson = false;
+      let data: any = null;
+      let text = '';
+      try {
+        text = await res.text();
+        const trimmed = text.trim();
+        if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+          data = JSON.parse(trimmed);
+          isJson = true;
+        }
+      } catch {}
+
+      if (isJson && (data?.status === 'ok' || data?.friendship_status?.following === false || data?.following === false)) {
         return { success: true };
       }
-      if (data?.feedback_message || data?.message) {
+      if (isJson && (data?.feedback_message || data?.message)) {
         lastError = data.feedback_message || data.message;
+      } else if (!isJson) {
+        if (res.status === 401 || res.status === 403 || text.includes('login')) {
+          lastError = 'Instagram session expired. Please log into Instagram in your open tab.';
+        } else if (res.status === 429 || text.includes('checkpoint') || text.includes('feedback_required')) {
+          lastError = 'Instagram action limit reached. Please wait a few moments before unfollowing.';
+        } else {
+          lastError = `Instagram rejected request (HTTP ${res.status}).`;
+        }
       }
     } catch (err: any) {
       lastError = err?.message || 'Network request failed.';

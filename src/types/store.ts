@@ -73,6 +73,8 @@ export interface AppState {
   setSortOrder: (order: SortOrder) => void;
   whitelistedOnly: boolean;
   setWhitelistedOnly: (value: boolean) => void;
+  accountTypeFilter: 'all' | 'personal' | 'page' | 'verified';
+  setAccountTypeFilter: (filter: 'all' | 'personal' | 'page' | 'verified') => void;
 
   // Selection for bulk actions
   selectedUsernames: string[];
@@ -94,6 +96,7 @@ export interface AppState {
 
   // Account metadata actions
   toggleWhitelist: (username: string) => Promise<void>;
+  toggleAccountType: (username: string) => Promise<void>;
   saveAccountNotes: (username: string, notes: string, tags?: string[]) => Promise<void>;
   unfollowAccount: (targetUsername: string, targetUserId?: string) => Promise<boolean>;
 

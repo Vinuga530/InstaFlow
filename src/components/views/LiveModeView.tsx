@@ -23,6 +23,7 @@ import {
   Users,
   Download,
   CheckCircle2,
+  Lock,
   AlertCircle,
   Loader2,
   ArrowRight,
@@ -428,10 +429,20 @@ export const LiveModeView: React.FC = () => {
                   <div className="flex items-center gap-3 min-w-0">
                     <Avatar username={uname} size="sm" />
                     <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-bold text-[var(--text-primary)] truncate">
                           @{uname}
                         </span>
+                        {u.isVerified && (
+                          <span title="Verified Account" className="inline-flex items-center text-blue-500">
+                            <CheckCircle2 className="w-3.5 h-3.5 fill-blue-500 text-white dark:text-[#151716]" />
+                          </span>
+                        )}
+                        {u.isPrivate && (
+                          <span title="Private Account" className="inline-flex items-center text-[var(--text-tertiary)]">
+                            <Lock className="w-3 h-3" />
+                          </span>
+                        )}
                         <a
                           href={`https://www.instagram.com/${uname}/`}
                           target="_blank"
@@ -450,7 +461,8 @@ export const LiveModeView: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                    <Badge variant={(u as any).accountType === 'page' ? 'page' : 'personal'} />
                     <Badge variant="not_following_back" showIcon={false} />
                     <button
                       onClick={() => handleUnfollowSingle(uname, (u as any).id)}

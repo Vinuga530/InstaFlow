@@ -853,13 +853,32 @@ export default defineContentScript({
                 body: postBody,
                 credentials: 'include',
               });
-              const data = await res.json();
-              if (data?.status === 'ok' || data?.friendship_status?.following === false || data?.following === false) {
+              let isJson = false;
+              let data: any = null;
+              let text = '';
+              try {
+                text = await res.text();
+                const trimmed = text.trim();
+                if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+                  data = JSON.parse(trimmed);
+                  isJson = true;
+                }
+              } catch {}
+
+              if (isJson && (data?.status === 'ok' || data?.friendship_status?.following === false || data?.following === false)) {
                 sendResponse({ success: true, targetUserId: targetId, data });
                 return;
               }
-              if (data?.feedback_message || data?.message) {
+              if (isJson && (data?.feedback_message || data?.message)) {
                 lastError = data.feedback_message || data.message;
+              } else if (!isJson) {
+                if (res.status === 401 || res.status === 403 || text.includes('login')) {
+                  lastError = 'Instagram session expired. Please log into Instagram in your open tab.';
+                } else if (res.status === 429 || text.includes('checkpoint') || text.includes('feedback_required')) {
+                  lastError = 'Instagram action limit reached. Please wait before unfollowing.';
+                } else {
+                  lastError = `Instagram rejected request (HTTP ${res.status}).`;
+                }
               }
             } catch (e: any) {
               lastError = e.message;

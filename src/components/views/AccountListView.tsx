@@ -25,6 +25,10 @@ import {
   Smile,
   UserMinus,
   Loader2,
+  CheckCircle2,
+  Lock,
+  User,
+  Building2,
 } from 'lucide-react';
 
 interface AccountRowProps {
@@ -35,6 +39,7 @@ interface AccountRowProps {
   notes?: string;
   onToggleSelect: (username: string) => void;
   onToggleWhitelist: (username: string) => void;
+  onToggleAccountType: (username: string) => void;
   onOpenNotes: (account: AccountItem) => void;
   onUnfollow?: (username: string, userId?: string) => void;
 }
@@ -48,6 +53,7 @@ const AccountRow = React.memo<AccountRowProps>(
     notes,
     onToggleSelect,
     onToggleWhitelist,
+    onToggleAccountType,
     onOpenNotes,
     onUnfollow,
   }) => {
@@ -91,10 +97,20 @@ const AccountRow = React.memo<AccountRowProps>(
           <div className="flex items-center gap-3">
             <Avatar username={account.username} size="sm" />
             <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="font-bold text-xs text-[var(--text-primary)] truncate">
                   @{account.username}
                 </span>
+                {account.isVerified && (
+                  <span title="Verified Account" className="inline-flex items-center text-blue-500">
+                    <CheckCircle2 className="w-3.5 h-3.5 fill-blue-500 text-white dark:text-[#151716]" />
+                  </span>
+                )}
+                {account.isPrivate && (
+                  <span title="Private Account" className="inline-flex items-center text-[var(--text-tertiary)]">
+                    <Lock className="w-3 h-3" />
+                  </span>
+                )}
                 <a
                   href={account.profileUrl}
                   target="_blank"
@@ -124,7 +140,14 @@ const AccountRow = React.memo<AccountRowProps>(
         <td className="py-2.5 px-3.5 hidden sm:table-cell">
           <div className="flex items-center gap-1.5 flex-wrap">
             <Badge variant={badgeVariant} />
-            {isWhitelisted && <Badge variant="whitelisted" showIcon={false} />}
+            <button
+              onClick={() => onToggleAccountType(account.username)}
+              title={`Classified as ${account.accountType === 'page' ? 'Page / Brand' : 'Personal (Normal Person)'}. Click to switch.`}
+              className="cursor-pointer transition-transform active:scale-95"
+            >
+              <Badge variant={account.accountType === 'page' ? 'page' : 'personal'} />
+            </button>
+            {isWhitelisted && <Badge variant="whitelisted" showIcon={false} label="Keep" />}
           </div>
         </td>
 
@@ -201,6 +224,9 @@ export const AccountListView: React.FC = () => {
     setSortOrder,
     whitelistedOnly,
     setWhitelistedOnly,
+    accountTypeFilter,
+    setAccountTypeFilter,
+    toggleAccountType,
     selectedUsernames,
     toggleSelectUsername,
     selectAllUsernames,
@@ -241,7 +267,7 @@ export const AccountListView: React.FC = () => {
   // Reset to page 1 whenever category, search, or filter changes
   React.useEffect(() => {
     setPage(1);
-  }, [activeCategory, debouncedSearch, whitelistedOnly]);
+  }, [activeCategory, debouncedSearch, whitelistedOnly, accountTypeFilter]);
 
   // 1. Pick dataset based on category
   const rawData: AccountItem[] = useMemo(() => {
@@ -274,6 +300,19 @@ export const AccountListView: React.FC = () => {
     newFollowers,
   ]);
 
+  // Account Type Counts for quick classification filter tabs
+  const typeCounts = useMemo(() => {
+    let personal = 0;
+    let pageCount = 0;
+    let verified = 0;
+    for (const a of rawData) {
+      if (a.accountType === 'personal') personal++;
+      if (a.accountType === 'page') pageCount++;
+      if (a.isVerified) verified++;
+    }
+    return { all: rawData.length, personal, page: pageCount, verified };
+  }, [rawData]);
+
   // 2. Filter data
   const filteredData: AccountItem[] = useMemo(() => {
     let result = rawData;
@@ -296,6 +335,15 @@ export const AccountListView: React.FC = () => {
       });
     }
 
+    // Account Type Filter (Personal vs Page vs Verified)
+    if (accountTypeFilter === 'personal') {
+      result = result.filter((a) => a.accountType === 'personal');
+    } else if (accountTypeFilter === 'page') {
+      result = result.filter((a) => a.accountType === 'page');
+    } else if (accountTypeFilter === 'verified') {
+      result = result.filter((a) => !!a.isVerified);
+    }
+
     // 3. Sort data
     return [...result].sort((a, b) => {
       if (sortField === 'username') {
@@ -308,7 +356,7 @@ export const AccountListView: React.FC = () => {
       }
       return 0;
     });
-  }, [rawData, debouncedSearch, whitelistedOnly, sortField, sortOrder, accountMetadataMap]);
+  }, [rawData, debouncedSearch, whitelistedOnly, accountTypeFilter, sortField, sortOrder, accountMetadataMap]);
 
   // 4. Pagination
   const totalCount = filteredData.length;
@@ -396,6 +444,65 @@ export const AccountListView: React.FC = () => {
 
   return (
     <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-4 animate-in fade-in duration-200">
+      {/* Account Type Classification Filter Pills */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar text-xs">
+        <button
+          onClick={() => {
+            setAccountTypeFilter('all');
+            setPage(1);
+          }}
+          className={`px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
+            accountTypeFilter === 'all'
+              ? 'bg-[var(--accent-primary)] text-white shadow-sm'
+              : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
+          }`}
+        >
+          All Accounts ({typeCounts.all})
+        </button>
+        <button
+          onClick={() => {
+            setAccountTypeFilter('personal');
+            setPage(1);
+          }}
+          className={`px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 flex items-center gap-1.5 ${
+            accountTypeFilter === 'personal'
+              ? 'bg-emerald-600 text-white shadow-sm'
+              : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-emerald-500 border border-[var(--border-subtle)]'
+          }`}
+        >
+          <User className="w-3.5 h-3.5" />
+          <span>Personal / Normal People ({typeCounts.personal})</span>
+        </button>
+        <button
+          onClick={() => {
+            setAccountTypeFilter('page');
+            setPage(1);
+          }}
+          className={`px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 flex items-center gap-1.5 ${
+            accountTypeFilter === 'page'
+              ? 'bg-sky-600 text-white shadow-sm'
+              : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-sky-500 border border-[var(--border-subtle)]'
+          }`}
+        >
+          <Building2 className="w-3.5 h-3.5" />
+          <span>Pages &amp; Brands ({typeCounts.page})</span>
+        </button>
+        <button
+          onClick={() => {
+            setAccountTypeFilter('verified');
+            setPage(1);
+          }}
+          className={`px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 flex items-center gap-1.5 ${
+            accountTypeFilter === 'verified'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-blue-500 border border-[var(--border-subtle)]'
+          }`}
+        >
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          <span>Verified ({typeCounts.verified})</span>
+        </button>
+      </div>
+
       {/* Search, Filter & Bulk Controls Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
         {/* Instant Search input */}
@@ -556,6 +663,7 @@ export const AccountListView: React.FC = () => {
                   notes={notes}
                   onToggleSelect={toggleSelectUsername}
                   onToggleWhitelist={toggleWhitelist}
+                  onToggleAccountType={toggleAccountType}
                   onOpenNotes={setSelectedAccountForNotes}
                   onUnfollow={handleUnfollow}
                 />

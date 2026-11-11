@@ -1,6 +1,7 @@
 import { NormalizedAccount } from '../../types/instagram';
 import { AccountItem, SnapshotMetrics } from '../../types/analytics';
 import { AccountMetadata } from '../../types/database';
+import { classifyAccount } from '../../utils/accountClassifier';
 
 /**
  * Calculates accounts that the user follows, but who do not follow back.
@@ -97,6 +98,15 @@ export function enrichAccountItems(
     const isFollowing = followingSet.has(norm);
     const isMutual = isFollower && isFollowing;
     const meta = metadataMap.get(norm);
+    const tags = meta?.tags || [];
+
+    const classified = classifyAccount({
+      username: acc.username,
+      fullName: acc.fullName,
+      isPrivate: acc.isPrivate,
+      isVerified: acc.isVerified,
+      tags,
+    });
 
     return {
       ...acc,
@@ -104,8 +114,11 @@ export function enrichAccountItems(
       isFollowing,
       isMutual,
       isWhitelisted: !!meta?.isWhitelisted,
+      isVerified: classified.isVerified,
+      isPrivate: classified.isPrivate,
+      accountType: classified.accountType,
       notes: meta?.notes,
-      tags: meta?.tags || [],
+      tags,
       isUnfollower: flags?.isUnfollower,
       isNewFollower: flags?.isNewFollower,
     };

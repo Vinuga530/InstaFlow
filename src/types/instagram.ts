@@ -35,6 +35,10 @@ export interface NormalizedAccount {
   fullName?: string;
   profileUrl: string;
   timestamp: number; // Unix timestamp in milliseconds
+  userId?: string;
+  isVerified?: boolean;
+  isPrivate?: boolean;
+  accountType?: 'personal' | 'page';
   raw?: unknown;
 }
 

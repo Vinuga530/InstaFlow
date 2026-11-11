@@ -9,7 +9,7 @@ export default defineConfig({
     name: 'InstaTrack - Instagram Relationship Analytics',
     description: 'Privacy-first follower analytics, unfollower detection, and relationship tracking for Instagram.',
     version: '1.0.0',
-    permissions: ['storage', 'unlimitedStorage', 'tabs', 'scripting', 'activeTab'],
+    permissions: ['storage', 'unlimitedStorage', 'tabs', 'scripting', 'activeTab', 'cookies'],
     host_permissions: [
       '*://*.instagram.com/*',
       '*://instagram.com/*',

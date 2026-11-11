@@ -37,6 +37,7 @@ export interface ExportedUser {
   fullName?: string;
   isVerified?: boolean;
   isPrivate?: boolean;
+  accountType?: 'personal' | 'page';
   profilePicUrl?: string;
   profileUrl: string;
   relationship?: 'follower' | 'following' | 'mutual' | 'not_following_back' | 'fan';
@@ -544,10 +545,35 @@ export async function unfollowInstagramUser(options: {
     throw new Error('Chrome scripting API unavailable.');
   }
 
+  // Pre-fetch authentic CSRF token via Chrome cookies API if available
+  let chromeCookieCsrf = '';
+  if (typeof chrome !== 'undefined' && chrome.cookies?.get) {
+    try {
+      const c = await chrome.cookies.get({ url: 'https://www.instagram.com', name: 'csrftoken' });
+      if (c?.value) {
+        chromeCookieCsrf = c.value;
+      }
+    } catch {}
+  }
+
   try {
     const res = await chrome.scripting.executeScript({
       target: { tabId },
-      func: async (uid: string, uname: string) => {
+      func: async (uid: string, uname: string, passedCsrf: string) => {
+        // Safe JSON parser to prevent "Unexpected token '<', <!DOCTYPE... is not valid JSON"
+        const safeParseJson = async (r: Response): Promise<{ isJson: boolean; data: any; text: string }> => {
+          try {
+            const raw = await r.text();
+            const trimmed = raw.trim();
+            if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+              return { isJson: true, data: JSON.parse(trimmed), text: raw };
+            }
+            return { isJson: false, data: null, text: raw };
+          } catch {
+            return { isJson: false, data: null, text: '' };
+          }
+        };
+
         // Helper to extract cookie value
         const getCookie = (name: string): string => {
           const match = document.cookie.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
@@ -555,7 +581,7 @@ export async function unfollowInstagramUser(options: {
         };
 
         // 1. Multi-source CSRF token resolution
-        let csrfToken = getCookie('csrftoken');
+        let csrfToken = passedCsrf || getCookie('csrftoken');
 
         if (!csrfToken) {
           const metaCsrf = document.querySelector('meta[name="csrf-token"]');
@@ -585,8 +611,10 @@ export async function unfollowInstagramUser(options: {
           try {
             const sRes = await fetch('/data/shared_data/', { credentials: 'include' });
             if (sRes.ok) {
-              const sJson = await sRes.json();
-              csrfToken = sJson?.config?.csrf_token || '';
+              const { isJson, data } = await safeParseJson(sRes);
+              if (isJson && data?.config?.csrf_token) {
+                csrfToken = data.config.csrf_token;
+              }
             }
           } catch {}
         }
@@ -662,15 +690,17 @@ export async function unfollowInstagramUser(options: {
                 credentials: 'include',
               });
               if (searchRes.ok) {
-                const sJson = await searchRes.json();
-                const users = sJson?.users || [];
-                const matched = users.find(
-                  (u: any) =>
-                    u?.user?.username?.toLowerCase() === targetClean
-                );
-                if (matched?.user) {
-                  const foundId = matched.user.pk || matched.user.pk_id || matched.user.id;
-                  if (foundId) finalId = String(foundId);
+                const { isJson, data } = await safeParseJson(searchRes);
+                if (isJson) {
+                  const users = data?.users || [];
+                  const matched = users.find(
+                    (u: any) =>
+                      u?.user?.username?.toLowerCase() === targetClean
+                  );
+                  if (matched?.user) {
+                    const foundId = matched.user.pk || matched.user.pk_id || matched.user.id;
+                    if (foundId) finalId = String(foundId);
+                  }
                 }
               }
             }
@@ -693,9 +723,11 @@ export async function unfollowInstagramUser(options: {
               }
             );
             if (pRes.ok) {
-              const pJson = await pRes.json();
-              const id = pJson?.data?.user?.id || pJson?.data?.user?.pk;
-              if (id) finalId = String(id);
+              const { isJson, data } = await safeParseJson(pRes);
+              if (isJson) {
+                const id = data?.data?.user?.id || data?.data?.user?.pk;
+                if (id) finalId = String(id);
+              }
             }
           } catch {}
         }
@@ -714,13 +746,15 @@ export async function unfollowInstagramUser(options: {
               }
             );
             if (aRes.ok) {
-              const aJson = await aRes.json();
-              const id =
-                aJson?.graphql?.user?.id ||
-                aJson?.user?.id ||
-                aJson?.user?.pk ||
-                aJson?.data?.user?.id;
-              if (id) finalId = String(id);
+              const { isJson, data } = await safeParseJson(aRes);
+              if (isJson) {
+                const id =
+                  data?.graphql?.user?.id ||
+                  data?.user?.id ||
+                  data?.user?.pk ||
+                  data?.data?.user?.id;
+                if (id) finalId = String(id);
+              }
             }
           } catch {}
         }
@@ -732,22 +766,30 @@ export async function unfollowInstagramUser(options: {
           };
         }
 
+        if (!csrfToken) {
+          return {
+            success: false,
+            targetUserId: finalId,
+            error: 'Could not resolve Instagram CSRF security token. Please ensure you are logged into Instagram in your open tab.',
+          };
+        }
+
         // 3. Post unfollow request with primary and fallback endpoints
         const defaultHeaders: Record<string, string> = {
           'x-ig-app-id': '936619743392459',
           'x-asbd-id': '129477',
           'x-requested-with': 'XMLHttpRequest',
           'x-instagram-ajax': '1',
+          'x-csrftoken': csrfToken,
           'content-type': 'application/x-www-form-urlencoded',
+          'accept': '*/*',
         };
-        if (csrfToken) {
-          defaultHeaders['x-csrftoken'] = csrfToken;
-        }
 
         const postBody = `user_id=${encodeURIComponent(finalId)}`;
         const endpoints = [
           `https://www.instagram.com/api/v1/friendships/destroy/${finalId}/`,
           `https://www.instagram.com/api/v1/web/friendships/${finalId}/unfollow/`,
+          `https://www.instagram.com/web/friendships/${finalId}/unfollow/`,
         ];
 
         let lastError = '';
@@ -760,23 +802,64 @@ export async function unfollowInstagramUser(options: {
               credentials: 'include',
             });
 
-            const data = await unfollowRes.json();
-            const isSuccess =
-              data?.status === 'ok' ||
-              data?.friendship_status?.following === false ||
-              data?.following === false;
+            const { isJson, data, text } = await safeParseJson(unfollowRes);
 
-            if (isSuccess) {
-              return { success: true, targetUserId: finalId, data };
-            }
+            if (isJson) {
+              const isSuccess =
+                data?.status === 'ok' ||
+                data?.friendship_status?.following === false ||
+                data?.following === false;
 
-            if (data?.message || data?.feedback_message) {
-              lastError = data.feedback_message || data.message;
+              if (isSuccess) {
+                return { success: true, targetUserId: finalId, data };
+              }
+
+              if (data?.feedback_message || data?.message) {
+                lastError = data.feedback_message || data.message;
+              }
+            } else {
+              // Gracefully handle non-JSON HTML responses without crashing
+              if (unfollowRes.status === 401 || unfollowRes.status === 403 || text.includes('login')) {
+                lastError = 'Instagram session expired or unauthorized. Please open Instagram and log in.';
+              } else if (unfollowRes.status === 429 || text.includes('checkpoint') || text.includes('feedback_required')) {
+                lastError = 'Instagram rate limit or verification checkpoint triggered. Please open Instagram to verify.';
+              } else if (unfollowRes.status === 404) {
+                lastError = 'Instagram user ID was not found.';
+              } else {
+                lastError = `Instagram rejected the request (HTTP ${unfollowRes.status}).`;
+              }
             }
           } catch (postErr: any) {
             lastError = postErr?.message || 'Network error';
           }
         }
+
+        // Strategy 6: In-DOM Button Click fallback (if active tab is on target's profile page)
+        try {
+          const currentPath = window.location.pathname.replace(/^\/|\/$/g, '').toLowerCase();
+          if (currentPath === targetClean) {
+            const buttons = Array.from(document.querySelectorAll('button, div[role="button"]'));
+            const followingBtn = buttons.find((b) => {
+              const txt = (b.textContent || '').trim().toLowerCase();
+              return txt === 'following' || txt === 'requested';
+            });
+            if (followingBtn) {
+              (followingBtn as HTMLElement).click();
+              await new Promise((resolve) => setTimeout(resolve, 400));
+              const dialogButtons = Array.from(
+                document.querySelectorAll('div[role="dialog"] button, div[role="dialog"] div[role="button"]')
+              );
+              const confirmBtn = dialogButtons.find((b) => {
+                const txt = (b.textContent || '').trim().toLowerCase();
+                return txt === 'unfollow';
+              });
+              if (confirmBtn) {
+                (confirmBtn as HTMLElement).click();
+                return { success: true, targetUserId: finalId };
+              }
+            }
+          }
+        } catch {}
 
         return {
           success: false,
@@ -784,7 +867,7 @@ export async function unfollowInstagramUser(options: {
           error: lastError || `Instagram rejected the unfollow request for @${uname}.`,
         };
       },
-      args: [targetUserId || '', targetUsername],
+      args: [targetUserId || '', targetUsername, chromeCookieCsrf],
     });
 
     const scriptResult = res?.[0]?.result as any;

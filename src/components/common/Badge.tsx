@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '../../utils/cn';
-import { UserCheck, UserMinus, UserPlus, Users, Star, ArrowUpRight } from 'lucide-react';
+import { UserCheck, UserMinus, UserPlus, Users, Star, ArrowUpRight, User, Building2, CheckCircle2 } from 'lucide-react';
 
 export type BadgeVariant =
   | 'mutual'
@@ -9,6 +9,9 @@ export type BadgeVariant =
   | 'unfollower'
   | 'new'
   | 'whitelisted'
+  | 'personal'
+  | 'page'
+  | 'verified'
   | 'neutral';
 
 export interface BadgeProps {
@@ -63,6 +66,24 @@ export const Badge: React.FC<BadgeProps> = ({
       bg: 'bg-[var(--status-warning-bg)] border-[var(--status-warning)]/25',
       text: 'text-[var(--status-warning)]',
       icon: <Star className="w-3 h-3 fill-current text-[var(--status-warning)]" />,
+    },
+    personal: {
+      defaultLabel: 'Personal',
+      bg: 'bg-emerald-500/10 border-emerald-500/25',
+      text: 'text-emerald-700 dark:text-emerald-400',
+      icon: <User className="w-3 h-3" />,
+    },
+    page: {
+      defaultLabel: 'Page / Brand',
+      bg: 'bg-sky-500/10 border-sky-500/25',
+      text: 'text-sky-700 dark:text-sky-400',
+      icon: <Building2 className="w-3 h-3" />,
+    },
+    verified: {
+      defaultLabel: 'Verified',
+      bg: 'bg-blue-500/10 border-blue-500/25',
+      text: 'text-blue-600 dark:text-blue-400',
+      icon: <CheckCircle2 className="w-3 h-3" />,
     },
     neutral: {
       defaultLabel: 'Account',

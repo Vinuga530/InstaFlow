@@ -19,6 +19,7 @@ import {
   getAccountMetadataMap,
   toggleAccountWhitelist,
   updateAccountNotes,
+  updateAccountClassification,
   removeFollowingRelationship,
 } from '../db';
 import {
@@ -251,6 +252,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   setSortOrder: (order: SortOrder) => set({ sortOrder: order }),
   whitelistedOnly: false,
   setWhitelistedOnly: (value: boolean) => set({ whitelistedOnly: value }),
+  accountTypeFilter: 'all',
+  setAccountTypeFilter: (filter: 'all' | 'personal' | 'page' | 'verified') =>
+    set({ accountTypeFilter: filter }),
 
   // Bulk selection
   selectedUsernames: [],
@@ -509,6 +513,58 @@ export const useAppStore = create<AppState>((set, get) => ({
       type: 'info',
       title: isWhitelisted ? 'Account Whitelisted' : 'Removed from Whitelist',
       message: `@${username} has been ${isWhitelisted ? 'added to' : 'removed from'} your whitelist.`,
+    });
+  },
+
+  // Toggle account classification (Personal vs Page/Brand)
+  toggleAccountType: async (username: string) => {
+    const norm = username.toLowerCase().trim();
+    const currentMeta = get().accountMetadataMap.get(norm);
+    const currentTags = currentMeta?.tags || [];
+    const isCurrentlyPage =
+      currentTags.includes('page') ||
+      currentTags.includes('brand') ||
+      currentTags.includes('business');
+    const newType: 'personal' | 'page' = isCurrentlyPage ? 'personal' : 'page';
+
+    await updateAccountClassification(norm, newType);
+
+    const updatedTags = currentTags
+      .filter((t) => t !== 'personal' && t !== 'page' && t !== 'business' && t !== 'brand')
+      .concat(newType);
+
+    const updatedMap = new Map(get().accountMetadataMap);
+    const existing = updatedMap.get(norm) || {
+      username: norm,
+      isWhitelisted: false,
+      tags: [],
+      firstSeen: Date.now(),
+      lastSeen: Date.now(),
+    };
+    updatedMap.set(norm, { ...existing, tags: updatedTags });
+
+    const updateList = (list: AccountItem[]) =>
+      list.map((item) =>
+        item.username.toLowerCase() === norm
+          ? { ...item, accountType: newType, tags: updatedTags }
+          : item
+      );
+
+    set({
+      accountMetadataMap: updatedMap,
+      followers: updateList(get().followers),
+      following: updateList(get().following),
+      notFollowingBack: updateList(get().notFollowingBack),
+      fans: updateList(get().fans),
+      mutuals: updateList(get().mutuals),
+      newFollowers: updateList(get().newFollowers),
+      unfollowers: updateList(get().unfollowers),
+    });
+
+    get().addToast({
+      type: 'info',
+      title: 'Classification Updated',
+      message: `Marked @${username} as ${newType === 'personal' ? 'Personal account' : 'Page / Brand'}.`,
     });
   },
 
